@@ -54,6 +54,7 @@ function advance() {
   if (sceneIndex < scenes.length - 1) showScene(sceneIndex + 1);
 }
 
+if (film) {
 $('#beginButton').addEventListener('click', (event) => { event.stopPropagation(); beginFilm(); });
 nextButton.addEventListener('click', (event) => { event.stopPropagation(); advance(); });
 film.addEventListener('click', (event) => {
@@ -88,8 +89,9 @@ $('#rsvpForm').addEventListener('submit', (event) => {
   window.location.href = `mailto:?subject=${subject}&body=${body}`;
   dialog.close();
 });
+}
 
-$('#calendarButton').addEventListener('click', (event) => {
+$('#calendarButton')?.addEventListener('click', (event) => {
   event.stopPropagation();
   const ics = ['BEGIN:VCALENDAR', 'VERSION:2.0', 'PRODID:-//Kalyani and Shuvam//Wedding//EN', 'BEGIN:VEVENT', 'UID:kalyani-shuvam-20280425@example.com', 'DTSTAMP:20260425T000000Z', 'DTSTART:20280425T124500Z', 'DTEND:20280425T174500Z', 'SUMMARY:Wedding of Kalyani & Shuvam', 'LOCATION:The Garden Mandap, Kathmandu', 'DESCRIPTION:Wedding ceremony at 6:30 PM Nepal Time.', 'END:VEVENT', 'END:VCALENDAR'].join('\r\n');
   const link = document.createElement('a');
@@ -98,12 +100,15 @@ $('#calendarButton').addEventListener('click', (event) => {
   link.click();
   URL.revokeObjectURL(link.href);
   const toast = $('#toast');
-  toast.classList.add('show');
-  setTimeout(() => toast.classList.remove('show'), 2800);
+  if (toast) {
+    toast.classList.add('show');
+    setTimeout(() => toast.classList.remove('show'), 2800);
+  }
 });
 
 const weddingDate = new Date('2028-04-25T18:30:00+05:45');
 function updateCountdown() {
+  if (!$('#days')) return;
   const remaining = Math.max(0, weddingDate - new Date());
   const day = 86400000;
   $('#days').textContent = Math.floor(remaining / day);
@@ -112,4 +117,9 @@ function updateCountdown() {
   $('#seconds').textContent = String(Math.floor((remaining % 60000) / 1000)).padStart(2, '0');
 }
 updateCountdown();
-setInterval(updateCountdown, 1000);
+if ($('#days')) setInterval(updateCountdown, 1000);
+
+const revealObserver = new IntersectionObserver((entries) => {
+  entries.forEach((entry) => { if (entry.isIntersecting) entry.target.classList.add('revealed'); });
+}, { threshold: .14 });
+document.querySelectorAll('[data-reveal]').forEach((element) => revealObserver.observe(element));
