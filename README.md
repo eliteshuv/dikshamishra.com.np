@@ -1,12 +1,32 @@
-# Kalyani & Shuvam — wedding invitation
+# Diksha & Aashik — Shubh Vivah
 
-This is a full-screen, no-scroll digital invitation. Guests tap the wax seal and the four scenes advance automatically like a small wedding film. They can tap anywhere to move ahead, turn on a subtle chime, RSVP, download a calendar invitation, or replay the film.
+The guest experience is contained in index.html, including all five images, CSS and JavaScript. Deploy this one file with CNAME for the existing GitHub Pages domain.
 
-Live at [dikshamishra.com.np](https://dikshamishra.com.np).
+## Share links
 
-## Personalise before launch
+- Announcement only: https://dikshamishra.com.np/
+- Three days, 24–26 November: https://dikshamishra.com.np/?v=d1
+- Wedding and evening party, 25 November: https://dikshamishra.com.np/?v=d2
+- Friends, 24–25 November and Kathmandu reception TBA: https://dikshamishra.com.np/?v=d3
 
-- In `index.html`, change venue text, timing, and copy as needed.
-- Replace any of the three images in `assets/` with your own wedding photos while keeping the filenames, or update the image paths in `styles.css`.
+Aliases ?v=full, ?v=day, ?v=friends and #full, #day, #friends also work. Root and invalid links show only the announcement. Versions are absent from navigation. These are guest-specific presentations, not password protection.
 
-The calendar button makes a universal `.ics` file that works with Google Calendar, Apple Calendar, Outlook, and most phone calendar apps.
+## Features
+
+- Seal opens automatically after three seconds, or immediately on tap.
+- Six cinematic chapters, scroll snapping, next/back, chapter dots and keyboard navigation.
+- Continuous automatic playback. Press and hold to linger; release resumes. Long chapters scroll their content before advancing. Hover never pauses.
+- Complete Nepali/English views with device-local language preference.
+- Three unchanged original artworks and two generated portrait scenes. Original mobile panels preserve complete compositions.
+- Animated light particles, bell petal burst, mandala, flame, image movement and staggered typography.
+- Optional synthesized ambient chimes and interactive bell, after user interaction.
+- Version-aware all-day calendar, share/copy, venue map, phone and WhatsApp.
+- Reduced motion, focus outlines, safe-area controls and no-JavaScript fallback.
+
+Wedding: 25 November 2026 / Mangsir 9, 2083. Phone: +977 974-5315294. Venue: Mithila Abadh Sanskritik Sanrakchan Parishad, Bajrang Chowk–8, opposite Janaki Health Care Hospital, Janakpur. Blessings: Dipendra Mishra and Nilam Mishra. Diksha’s parents host this invitation. Matkor: Sunday 22 November, provisional 4 PM. Haldi/Mehendi/Sangeet/concert: Tuesday 24 November from around 6 PM. Party: Wednesday 25 November at 6 PM, concert ~7:30 PM, Barmala ~9 PM. Bidai: Thursday 26 November, provisional 9 AM. Kathmandu reception TBA.
+
+## Editing
+
+Edit invitation.source.html, then run python build_invitation.py with Pillow installed. Image tokens are replaced with embedded WebPs. Preserve original PNGs; generated portrait WebPs are included. index.html runs independently of all source files and assets. Google Fonts is optional, with system fallbacks.
+
+verify.cjs uses the available local Playwright runtime and Edge to check routes, schedules, mobile/desktop/landscape widths, language, navigation and browser errors. Preview images are ignored. See DESIGN.md for artwork prompts and references.
