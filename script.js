@@ -93,7 +93,7 @@ $('#rsvpForm').addEventListener('submit', (event) => {
 
 $('#calendarButton')?.addEventListener('click', (event) => {
   event.stopPropagation();
-  const ics = ['BEGIN:VCALENDAR', 'VERSION:2.0', 'PRODID:-//Kalyani and Shuvam//Wedding//EN', 'BEGIN:VEVENT', 'UID:kalyani-shuvam-20280425@example.com', 'DTSTAMP:20260425T000000Z', 'DTSTART:20280425T124500Z', 'DTEND:20280425T174500Z', 'SUMMARY:Wedding of Kalyani & Shuvam', 'LOCATION:The Garden Mandap, Kathmandu', 'DESCRIPTION:Wedding ceremony at 6:30 PM Nepal Time.', 'END:VEVENT', 'END:VCALENDAR'].join('\r\n');
+  const ics = ['BEGIN:VCALENDAR', 'VERSION:2.0', 'PRODID:-//Kalyani and Shuvam//Wedding//EN', 'BEGIN:VEVENT', 'UID:kalyani-shuvam-20030425@example.com', 'DTSTAMP:20260425T000000Z', 'DTSTART:20030425T124500Z', 'DTEND:20030425T174500Z', 'SUMMARY:Wedding of Kalyani & Shuvam', 'LOCATION:The Garden Mandap, Kathmandu', 'DESCRIPTION:Wedding ceremony at 6:30 PM Nepal Time.', 'END:VEVENT', 'END:VCALENDAR'].join('\r\n');
   const link = document.createElement('a');
   link.href = URL.createObjectURL(new Blob([ics], { type: 'text/calendar' }));
   link.download = 'kalyani-shuvam-wedding.ics';
@@ -106,7 +106,7 @@ $('#calendarButton')?.addEventListener('click', (event) => {
   }
 });
 
-const weddingDate = new Date('2028-04-25T18:30:00+05:45');
+const weddingDate = new Date('2003-04-25T18:30:00+05:45');
 function updateCountdown() {
   if (!$('#days')) return;
   const remaining = Math.max(0, weddingDate - new Date());
