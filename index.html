@@ -23,14 +23,24 @@
 
   <link rel="preload" as="image" href="assets/couture/bg_act1_temple.webp" />
   <link rel="preload" as="image" href="assets/couture/layer_ganesha.webp" />
+  <link rel="preload" as="audio" href="assets/couture/seg1_ganesh.mp3" />
   <link rel="stylesheet" href="assets/couture/couture.css" />
 </head>
 <body class="gate-locked">
 
-  <!-- Finalized Bride Master Soundtrack -->
-  <audio id="bride-master-audio" src="assets/couture/bride_soundtrack.mp3" loop preload="auto"></audio>
+  <!-- ========================================================================
+       SMART CHAPTER-ADAPTIVE MULTI-SONG DECK (6 SEAMLESS LOOPING STEMS)
+       ======================================================================== -->
+  <div id="audio-deck-rack" hidden aria-hidden="true">
+    <audio id="audio-ch1" src="assets/couture/seg1_ganesh.mp3" loop preload="auto"></audio>
+    <audio id="audio-ch2" src="assets/couture/seg2_couple.mp3" loop preload="metadata"></audio>
+    <audio id="audio-ch3" src="assets/couture/seg3_sangeet.mp3" loop preload="none"></audio>
+    <audio id="audio-ch4" src="assets/couture/seg4_vivah.mp3" loop preload="none"></audio>
+    <audio id="audio-ch5" src="assets/couture/seg5_venue.mp3" loop preload="none"></audio>
+    <audio id="audio-ch6" src="assets/couture/seg6_finale.mp3" loop preload="none"></audio>
+  </div>
 
-  <!-- Shared Couture SVG Definitions (Gold Foil, Brass Samai, Jharokha Lattice) -->
+  <!-- Shared Couture SVG Definitions (Gold Foil, Brass Samai, Jharokha Lattice, Filigree) -->
   <svg width="0" height="0" aria-hidden="true" style="position:absolute; width:0; height:0; overflow:hidden;">
     <defs>
       <linearGradient id="goldFoil" x1="0%" y1="0%" x2="100%" y2="100%">
@@ -88,7 +98,6 @@
         <ellipse cx="90" cy="148" rx="52" ry="7" fill="#FCE59E" stroke="#9C6514" stroke-width="1.5" />
         <path d="M90 88 C104 108, 106 128, 90 144 C74 128, 76 108, 90 88 Z" fill="url(#brassGrad)" />
         <circle cx="90" cy="82" r="7" fill="url(#brassGrad)" />
-        <!-- Live Multi-Wick Golden Flames -->
         <g class="samai-flame-group">
           <path d="M42 146 C49 132, 48 118, 42 108 C36 118, 35 132, 42 146 Z" fill="#FF9E1B" />
           <path d="M42 143 C45 134, 45 125, 42 118 C39 125, 39 134, 42 143 Z" fill="#FFF9D6" />
@@ -142,7 +151,7 @@
   <div id="lens-bloom" aria-hidden="true"></div>
 
   <!-- ========================================================================
-       3D ROYAL BI-FOLD JHAROKHA PALACE GATEFOLD OPENING
+       SMART AUTO-OPENING 3D ROYAL BI-FOLD JHAROKHA GATEFOLD (2.7s + TAP)
        ======================================================================== -->
   <div id="royal-gatefold" role="dialog" aria-modal="true" aria-label="Royal Wedding Invitation Gatefold">
     <div id="gate-wing-left" class="gate-wing">
@@ -166,11 +175,15 @@
       <button type="button" id="seal-unlock-btn" aria-label="Unlock Royal Seal and Open Invitation">
         <svg width="100%" height="100%" viewBox="0 0 300 300" style="overflow:visible;">
           <circle cx="150" cy="150" r="144" fill="url(#sacredSunGlow)" />
-          <circle cx="150" cy="150" r="120" fill="#5A0F24" stroke="url(#goldFoil)" stroke-width="7" />
-          <circle cx="150" cy="150" r="103" fill="none" stroke="url(#goldFoil)" stroke-width="2.2" stroke-dasharray="7 5" />
-          <circle cx="150" cy="150" r="90" fill="none" stroke="#E5BA63" stroke-width="1.2" opacity="0.72" />
-          <text x="150" y="162" text-anchor="middle" font-family="'Cinzel', serif" font-weight="800" font-size="64" fill="#FFF3C4" letter-spacing="2">D<tspan font-family="'Great Vibes', cursive" font-size="50" fill="#E5BA63">&amp;</tspan>A</text>
-          <text x="150" y="199" text-anchor="middle" font-family="'Cinzel', serif" font-weight="700" font-size="13" fill="#E5BA63" letter-spacing="5">25 · 11 · 2026</text>
+          <!-- Animated 2.7s Auto-Open Gold Progress Ring -->
+          <circle cx="150" cy="150" r="131" fill="none" stroke="rgba(229, 186, 99, 0.25)" stroke-width="4" />
+          <circle id="gate-auto-ring" cx="150" cy="150" r="131" fill="none" stroke="url(#goldFoil)" stroke-width="5"
+                  stroke-linecap="round" stroke-dasharray="823" stroke-dashoffset="823"
+                  transform="rotate(-90 150 150)" />
+          <circle cx="150" cy="150" r="118" fill="#5A0F24" stroke="url(#goldFoil)" stroke-width="6.5" />
+          <circle cx="150" cy="150" r="102" fill="none" stroke="url(#goldFoil)" stroke-width="2" stroke-dasharray="7 5" />
+          <text x="150" y="162" text-anchor="middle" font-family="'Cinzel', serif" font-weight="800" font-size="62" fill="#FFF3C4" letter-spacing="2">D<tspan font-family="'Great Vibes', cursive" font-size="48" fill="#E5BA63">&amp;</tspan>A</text>
+          <text x="150" y="198" text-anchor="middle" font-family="'Cinzel', serif" font-weight="700" font-size="12.5" fill="#E5BA63" letter-spacing="5">25 · 11 · 2026</text>
         </svg>
       </button>
 
@@ -185,18 +198,18 @@
          data-ne="८ – ९ मंसिर २०८३<span class='gate-sep'> &nbsp;·&nbsp; </span><span class='gate-city'>जनकपुरधाम</span>">24 – 25 NOVEMBER 2026<span class="gate-sep"> &nbsp;·&nbsp; </span><span class="gate-city">JANAKPUR DHAM</span></p>
 
       <button type="button" id="gate-enter-music-btn" class="gate-cta-primary">
-        <span>♫</span>
-        <span data-en="Tap Seal to Open Invitation" data-ne="निमन्त्रणा खोल्नुहोस्">Tap Seal to Open Invitation</span>
+        <span>✨</span>
+        <span data-en="Tap to Open Now" data-ne="अहिले खोल्नुहोस्">Tap to Open Now</span>
       </button>
 
-      <button type="button" id="gate-enter-muted-btn" class="gate-cta-muted"
-              data-en="Open without music"
-              data-ne="संगीत बिना खोल्नुहोस्">Open without music</button>
+      <p id="gate-auto-hint" class="gate-auto-status"
+         data-en="Unfolding automatically…"
+         data-ne="द्वार स्वतः खुल्दैछ…">Unfolding automatically…</p>
     </div>
   </div>
 
   <!-- ========================================================================
-       PERSISTENT ROYAL HUD TOPBAR & BOTTOM QUICK-JUMP DOCK
+       PERSISTENT SMART HUD TOPBAR (ADAPTIVE SONG PILL + AUTO-SCROLL CRUISE)
        ======================================================================== -->
   <header id="royal-topbar">
     <a href="#ch1-invocation" class="brand-crest-btn" aria-label="Dr. Diksha and Dr. Aashik Home">
@@ -204,43 +217,50 @@
     </a>
 
     <div class="hud-controls">
-      <button type="button" id="lang-toggle-btn" class="hud-pill" aria-label="Switch language to Nepali">नेपाली</button>
-
-      <button type="button" id="music-toggle-btn" class="hud-pill" aria-pressed="false">
-        <span class="eq-bars" aria-hidden="true"><i></i><i></i><i></i><i></i></span>
-        <span id="music-pill-label" class="pill-text-desktop">Play Music</span>
+      <button type="button" id="autoscroll-toggle-btn" class="hud-pill active-auto" aria-pressed="true" title="Toggle Smart Auto-Scroll Story">
+        <svg class="auto-ring-svg" width="16" height="16" viewBox="0 0 24 24" aria-hidden="true">
+          <circle cx="12" cy="12" r="9.5" fill="none" stroke="currentColor" stroke-opacity="0.28" stroke-width="2.5" />
+          <circle id="auto-progress-circle" cx="12" cy="12" r="9.5" fill="none" stroke="currentColor" stroke-width="2.6"
+                  stroke-linecap="round" stroke-dasharray="59.7" stroke-dashoffset="59.7" transform="rotate(-90 12 12)" />
+        </svg>
+        <span id="autoscroll-label">Auto</span>
       </button>
 
-      <button type="button" id="hud-flower-btn" class="hud-pill icon-only" title="Shower Flower Petals" aria-label="Shower Flower Petals">✿</button>
+      <button type="button" id="music-toggle-btn" class="hud-pill active-music" aria-pressed="true" title="Toggle Chapter Soundtrack">
+        <span class="eq-bars" aria-hidden="true"><i></i><i></i><i></i><i></i></span>
+        <span id="music-pill-label" class="pill-text-desktop">Ganesh Vandana</span>
+      </button>
 
-      <button type="button" id="hud-bell-btn" class="hud-pill icon-only" title="Ring Temple Bell" aria-label="Ring Temple Bell">🔔</button>
+      <button type="button" id="lang-toggle-btn" class="hud-pill" aria-label="Switch language to Nepali">नेपाली</button>
+
+      <button type="button" id="hud-bell-btn" class="hud-pill icon-only" title="Ring Temple Bell &amp; Shower Petals" aria-label="Ring Temple Bell">🔔</button>
     </div>
   </header>
 
   <nav id="chapter-dock" aria-label="Celebration Chapters">
     <button type="button" class="dock-btn active" data-target="ch1-invocation">
       <span class="dock-num">01</span>
-      <span class="dock-label" data-en="Blessing" data-ne="आशीर्वाद">Blessing</span>
+      <span class="dock-label" data-en="Ganesh Ji" data-ne="श्री गणेश">Ganesh Ji</span>
     </button>
     <button type="button" class="dock-btn" data-target="ch2-couple">
       <span class="dock-num">02</span>
-      <span class="dock-label" data-en="Diksha &amp; Aashik" data-ne="वर-वधु">Diksha &amp; Aashik</span>
+      <span class="dock-label" data-en="Couple" data-ne="वर-वधु">Couple</span>
     </button>
     <button type="button" class="dock-btn" data-target="ch3-carnival">
       <span class="dock-num">03</span>
-      <span class="dock-label" data-en="Haldi &amp; Sangeet" data-ne="हल्दी र संगीत">Haldi &amp; Sangeet</span>
+      <span class="dock-label" data-en="Sangeet" data-ne="हल्दी-संगीत">Sangeet</span>
     </button>
     <button type="button" class="dock-btn" data-target="ch4-vivah">
       <span class="dock-num">04</span>
-      <span class="dock-label" data-en="The Wedding" data-ne="शुभ विवाह">The Wedding</span>
+      <span class="dock-label" data-en="Wedding" data-ne="शुभ विवाह">Wedding</span>
     </button>
     <button type="button" class="dock-btn" data-target="ch5-venue">
       <span class="dock-num">05</span>
-      <span class="dock-label" data-en="Venue &amp; Map" data-ne="समारोह स्थल">Venue &amp; Map</span>
+      <span class="dock-label" data-en="Venue" data-ne="स्थान">Venue</span>
     </button>
     <button type="button" class="dock-btn" data-target="ch6-finale">
       <span class="dock-num">06</span>
-      <span class="dock-label" data-en="RSVP &amp; Wishes" data-ne="उपस्थिति">RSVP &amp; Wishes</span>
+      <span class="dock-label" data-en="RSVP" data-ne="उपस्थिति">RSVP</span>
     </button>
   </nav>
 
@@ -249,37 +269,27 @@
   <main>
 
     <!-- ======================================================================
-         CHAPTER 1: DIVINE BHAGWAN TEMPLE INVOCATION & HOST WELCOME
+         SEGMENT 1: GANESH JI TEMPLE SANCTUARY (Plays Sacred Ganesh Mantra)
          ====================================================================== -->
-    <section id="ch1-invocation" class="couture-chapter in-view">
+    <section id="ch1-invocation" class="couture-chapter in-view" data-chapter-index="0">
       <img class="chapter-bg-ambient" src="assets/couture/bg_act1_temple.webp" alt="" aria-hidden="true" />
       <img class="chapter-bg-main" src="assets/couture/bg_act1_temple.webp" alt="Carved marble temple sanctuary" />
       <div class="chapter-veil" aria-hidden="true"></div>
 
-      <!-- Top Crimson-Blush Rose & Jasmine Arch + 5 Interactive Harmonic Brass Bells -->
+      <!-- Top Crimson-Blush Rose & Jasmine Arch + 5 Harmonic Brass Bells -->
       <div class="top-floral-arch-wrap">
         <img class="top-floral-arch-img" src="assets/couture/layer_rose_arch_nobells.webp" alt="" />
         <div class="interactive-bells-row">
-          <button type="button" class="hanging-bell-btn" aria-label="Ring temple bell 1">
-            <img src="assets/couture/prop_brass_bell.webp" alt="" />
-          </button>
-          <button type="button" class="hanging-bell-btn" aria-label="Ring temple bell 2">
-            <img src="assets/couture/prop_brass_bell.webp" alt="" />
-          </button>
-          <button type="button" class="hanging-bell-btn" aria-label="Ring center temple bell">
-            <img src="assets/couture/prop_brass_bell.webp" alt="" />
-          </button>
-          <button type="button" class="hanging-bell-btn" aria-label="Ring temple bell 4">
-            <img src="assets/couture/prop_brass_bell.webp" alt="" />
-          </button>
-          <button type="button" class="hanging-bell-btn" aria-label="Ring temple bell 5">
-            <img src="assets/couture/prop_brass_bell.webp" alt="" />
-          </button>
+          <button type="button" class="hanging-bell-btn" aria-label="Ring temple bell 1"><img src="assets/couture/prop_brass_bell.webp" alt="" /></button>
+          <button type="button" class="hanging-bell-btn" aria-label="Ring temple bell 2"><img src="assets/couture/prop_brass_bell.webp" alt="" /></button>
+          <button type="button" class="hanging-bell-btn" aria-label="Ring center temple bell"><img src="assets/couture/prop_brass_bell.webp" alt="" /></button>
+          <button type="button" class="hanging-bell-btn" aria-label="Ring temple bell 4"><img src="assets/couture/prop_brass_bell.webp" alt="" /></button>
+          <button type="button" class="hanging-bell-btn" aria-label="Ring temple bell 5"><img src="assets/couture/prop_brass_bell.webp" alt="" /></button>
         </div>
       </div>
 
       <div class="ch1-grid">
-        <!-- Left: 3-Layer Counter-Rotating Surya & Sanskrit Mantra Halo + Interactive Ganesha & Samai Lamps -->
+        <!-- Left: 3-Layer Counter-Rotating Surya & Sanskrit Mantra Halo + Ganesha & Lit Samai Lamps -->
         <div class="ganesha-sanctuary-stage reveal-up">
           <svg class="mantra-halo-svg" viewBox="0 0 700 700" aria-hidden="true">
             <defs>
@@ -287,7 +297,7 @@
               <path id="mantraInner" d="M 350, 350 m -212, 0 a 212,212 0 1,1 424,0 a 212,212 0 1,1 -424,0" />
             </defs>
             <circle cx="350" cy="350" r="344" fill="url(#sacredSunGlow)" />
-            <g id="ch1-surya-rays" class="spin-rays" opacity="0.58"></g>
+            <g id="ch1-surya-rays" class="spin-rays" opacity="0.62"></g>
             <g class="spin-cw">
               <circle cx="350" cy="350" r="292" fill="none" stroke="#C88B28" stroke-width="1.8" stroke-opacity="0.65" stroke-dasharray="5 7" />
               <circle cx="350" cy="350" r="252" fill="none" stroke="#B6771B" stroke-width="1.5" stroke-opacity="0.72" />
@@ -309,20 +319,20 @@
             </g>
           </svg>
 
-          <button type="button" id="ganesha-blessing-btn" class="ganesha-interactive-btn" aria-label="Touch Lord Ganesha to receive a blessing">
+          <button type="button" id="ganesha-blessing-btn" class="ganesha-interactive-btn" aria-label="Touch Lord Ganesha to shower Pushpanjali petals">
             <img src="assets/couture/layer_ganesha.webp" alt="Lord Ganesha seated on a blooming pink lotus" />
           </button>
 
-          <button type="button" class="samai-lamp-btn left" aria-label="Illuminate left brass samai lamp">
+          <button type="button" class="samai-lamp-btn left boosted" aria-label="Illuminate left brass samai lamp">
             <svg viewBox="0 0 180 440"><use href="#brassSamai" /></svg>
           </button>
-          <button type="button" class="samai-lamp-btn right" aria-label="Illuminate right brass samai lamp">
+          <button type="button" class="samai-lamp-btn right boosted" aria-label="Illuminate right brass samai lamp">
             <svg viewBox="0 0 180 440"><use href="#brassSamai" /></svg>
           </button>
         </div>
 
-        <!-- Right: Sacred Shloka & Bride's Family Host Invitation -->
-        <div class="couture-card reveal-up delay-1" style="text-align:center;">
+        <!-- Right: Grand Clean Royal Host Card -->
+        <div class="couture-card royal-shimmer-card reveal-up delay-1" style="text-align:center;">
           <p class="shloka-sanskrit" style="font-size: clamp(20px, 2.4vw, 26px); font-weight: 800;">॥ श्री गणेशाय नमः ॥</p>
           <p class="shloka-sanskrit">
             वक्रतुण्ड महाकाय सूर्यकोटि समप्रभः ।<br />
@@ -332,46 +342,37 @@
           <svg class="gold-divider-svg" aria-hidden="true"><use href="#goldDivider" /></svg>
 
           <p class="eyebrow-royal"
-             data-en="Auspicious Bridal Wedding Invitation"
-             data-ne="मङ्गलमय शुभ विवाह निमन्त्रणा">Auspicious Bridal Wedding Invitation</p>
+             data-en="Auspicious Wedding Invitation"
+             data-ne="मङ्गलमय शुभ विवाह निमन्त्रणा">Auspicious Wedding Invitation</p>
 
-          <h2 class="script-display" style="font-size: clamp(44px, 5.6vw, 68px); margin: 8px 0;"
+          <h2 class="script-display gold-shimmer-title" style="font-size: clamp(46px, 5.8vw, 72px); margin: 6px 0;"
               data-en="A Sacred Beginning"
               data-ne="पवित्र मिलनको शुभारम्भ">A Sacred Beginning</h2>
 
           <p class="body-copy"
-             data-en="With the divine blessings of Lord Ganesha, <strong>Dipendra Mishra &amp; Nilam Mishra</strong> joyfully request the honour of your presence and blessings at the auspicious wedding celebrations of their beloved daughter <strong>Dr. Diksha Mishra</strong> with <strong>Dr. Aashik Jha</strong>."
-             data-ne="भगवान् श्री गणेशको असीम कृपा र आशीर्वादसहित <strong>दिपेन्द्र मिश्र तथा नीलम मिश्र</strong> आफ्नी आयुष्मती सुपुत्री <strong>डॉ. दीक्षा मिश्र</strong> र चिरञ्जीवी <strong>डॉ. आशिक झा</strong> को पावन शुभ विवाह समारोहमा यहाँको गरिमामय उपस्थिति तथा शुभाशीर्वादका निम्ति हार्दिक निमन्त्रणा गर्दछन्।">
-            With the divine blessings of Lord Ganesha, <strong>Dipendra Mishra &amp; Nilam Mishra</strong> joyfully request the honour of your presence and blessings at the auspicious wedding celebrations of their beloved daughter <strong>Dr. Diksha Mishra</strong> with <strong>Dr. Aashik Jha</strong>.
+             data-en="With the divine blessings of Lord Ganesha, <strong>Dipendra Mishra &amp; Nilam Mishra</strong> joyfully request the honour of your presence and blessings at the wedding celebrations of their beloved daughter <strong>Dr. Diksha Mishra</strong> with <strong>Dr. Aashik Jha</strong>."
+             data-ne="भगवान् श्री गणेशको असीम कृपा र आशीर्वादसहित <strong>दिपेन्द्र मिश्र तथा नीलम मिश्र</strong> आफ्नी आयुष्मती सुपुत्री <strong>डॉ. दीक्षा मिश्र</strong> र चिरञ्जीवी <strong>डॉ. आशिक झा</strong> को पावन शुभ विवाह समारोहमा यहाँको गरिमामय उपस्थितिका निम्ति हार्दिक निमन्त्रणा गर्दछन्।">
+            With the divine blessings of Lord Ganesha, <strong>Dipendra Mishra &amp; Nilam Mishra</strong> joyfully request the honour of your presence and blessings at the wedding celebrations of their beloved daughter <strong>Dr. Diksha Mishra</strong> with <strong>Dr. Aashik Jha</strong>.
           </p>
 
-          <div style="display:flex; flex-wrap:wrap; gap:10px; justify-content:center; margin-top:20px;">
+          <div style="display:flex; flex-wrap:wrap; gap:10px; justify-content:center; margin-top:18px;">
             <button type="button" id="offer-pushpanjali-btn" class="btn-royal">
               <span>✿</span>
-              <span data-en="Offer Pushpanjali Blessing" data-ne="पुष्पाञ्जली अर्पण गर्नुहोस्">Offer Pushpanjali Blessing</span>
+              <span data-en="Shower Pushpanjali" data-ne="पुष्पाञ्जली अर्पण">Shower Pushpanjali</span>
             </button>
-            <a href="#ch2-couple" class="btn-gold-outline"
-               data-en="Explore Celebrations ↓"
-               data-ne="समारोह विवरण हेर्नुहोस् ↓">Explore Celebrations ↓</a>
           </div>
-          <p style="margin-top:10px; font-family:var(--font-sans); font-size:11px; color:var(--ink-muted);"
-             data-en="Tip: Tap any hanging brass temple bell, Samai lamp, or Lord Ganesha!"
-             data-ne="माथिका घण्टी, पानस दीप वा भगवान् गणेशलाई छोएर आशीर्वाद लिनुहोस्!">
-            Tip: Tap any hanging brass temple bell, Samai lamp, or Lord Ganesha!
-          </p>
         </div>
       </div>
     </section>
 
     <!-- ======================================================================
-         CHAPTER 2: BRIDE'S COURTYARD REVEAL, MIRROR CREST & LIVE COUNTDOWN
+         SEGMENT 2: DR. DIKSHA & DR. AASHIK COURTYARD (Plays Romantic Courtyard Song)
          ====================================================================== -->
-    <section id="ch2-couple" class="couture-chapter">
+    <section id="ch2-couple" class="couture-chapter" data-chapter-index="1">
       <img class="chapter-bg-ambient" src="assets/couture/bg_act2_courtyard.webp" alt="" aria-hidden="true" />
       <img class="chapter-bg-main" src="assets/couture/bg_act2_courtyard.webp" alt="Sunset lotus lake palace courtyard" loading="lazy" />
       <div class="chapter-veil" aria-hidden="true"></div>
 
-      <!-- Swinging Floral Baskets & Gliding Watercolor Birds -->
       <div class="courtyard-sky-decor" aria-hidden="true">
         <img class="hanging-basket b-left" src="assets/couture/basket_left.webp" alt="" loading="lazy" />
         <img class="hanging-basket b-center" src="assets/couture/basket_center.webp" alt="" loading="lazy" />
@@ -382,8 +383,8 @@
       </div>
 
       <div class="ch2-layout">
-        <!-- Left: Illuminated 20-Bulb Edison Couture Mirror Crest + Couple Names + Countdown -->
-        <div class="couture-card couple-hero-names reveal-up">
+        <!-- Left: Illuminated 20-Bulb Edison Mirror Crest + Couple Names + Countdown -->
+        <div class="couture-card royal-shimmer-card couple-hero-names reveal-up">
           <div id="couture-mirror-crest" class="bulb-mirror-crest" role="button" tabindex="0" title="Tap for royal mirror sparkle" aria-label="D and A Illuminated Couture Mirror Crest">
             <svg width="100%" height="100%" viewBox="0 0 320 320" style="overflow: visible;">
               <defs>
@@ -410,7 +411,7 @@
              data-en="With Joy In Our Hearts, Join Us As"
              data-ne="हृदयभरिको खुसीका साथ, सहभागी भइदिनुहोस्">With Joy In Our Hearts, Join Us As</p>
 
-          <h2 class="bride-groom-title" style="margin-top:8px;"
+          <h2 class="bride-groom-title" style="margin-top:6px;"
               data-en="Dr. Diksha Mishra"
               data-ne="डॉ. दीक्षा मिश्र">Dr. Diksha Mishra</h2>
 
@@ -425,39 +426,21 @@
           <p class="serif-display" style="font-size: clamp(16px, 2vw, 21px); color: var(--vermillion); letter-spacing: 3px;"
              data-en="24 – 25 NOVEMBER 2026"
              data-ne="२४ – २५ नोभेम्बर २०२६">24 – 25 NOVEMBER 2026</p>
-          <p class="editorial-lead" style="margin-top: 3px;"
+          <p class="editorial-lead" style="margin-top: 2px;"
              data-en="8 – 9 Mangsir 2083 &nbsp;·&nbsp; Janakpur Dham, Nepal"
              data-ne="८ – ९ मंसिर २०८३ &nbsp;·&nbsp; जनकपुरधाम, नेपाल">8 – 9 Mangsir 2083 &nbsp;·&nbsp; Janakpur Dham, Nepal</p>
 
-          <!-- Live Countdown -->
           <div class="countdown-royal-grid" aria-label="Countdown to Shubh Vivah">
-            <div class="cd-tile">
-              <b id="cd-days">00</b>
-              <small data-en="Days" data-ne="दिन">Days</small>
-            </div>
-            <div class="cd-tile">
-              <b id="cd-hours">00</b>
-              <small data-en="Hours" data-ne="घण्टा">Hours</small>
-            </div>
-            <div class="cd-tile">
-              <b id="cd-mins">00</b>
-              <small data-en="Minutes" data-ne="मिनेट">Minutes</small>
-            </div>
-            <div class="cd-tile">
-              <b id="cd-secs">00</b>
-              <small data-en="Seconds" data-ne="सेकेन्ड">Seconds</small>
-            </div>
+            <div class="cd-tile"><b id="cd-days">00</b><small data-en="Days" data-ne="दिन">Days</small></div>
+            <div class="cd-tile"><b id="cd-hours">00</b><small data-en="Hours" data-ne="घण्टा">Hours</small></div>
+            <div class="cd-tile"><b id="cd-mins">00</b><small data-en="Minutes" data-ne="मिनेट">Minutes</small></div>
+            <div class="cd-tile"><b id="cd-secs">00</b><small data-en="Seconds" data-ne="सेकेन्ड">Seconds</small></div>
           </div>
 
-          <div style="display:flex; flex-wrap:wrap; justify-content:center; gap:10px;">
-            <button type="button" class="btn-royal save-ics-trigger">
-              <span>📅</span>
-              <span data-en="Save Both Dates to Calendar" data-ne="पात्रोमा मिति सुरक्षित गर्नुहोस्">Save Both Dates to Calendar</span>
-            </button>
-            <a href="#ch3-carnival" class="btn-gold-outline"
-               data-en="Haldi &amp; Sangeet ↓"
-               data-ne="हल्दी र संगीत ↓">Haldi &amp; Sangeet ↓</a>
-          </div>
+          <button type="button" class="btn-royal save-ics-trigger">
+            <span>📅</span>
+            <span data-en="Save Both Dates to Calendar" data-ne="पात्रोमा मिति सुरक्षित गर्नुहोस्">Save Both Dates to Calendar</span>
+          </button>
         </div>
 
         <!-- Right: 2.5D Breeze-Warped Lakeside Couple Back-Portrait + Swaying Lotuses -->
@@ -471,17 +454,15 @@
     </section>
 
     <!-- ======================================================================
-         CHAPTER 3: HALDI · MEHENDI · SANGEET NIGHT (24 NOVEMBER 2026)
+         SEGMENT 3: HALDI · MEHENDI · SANGEET NIGHT (Plays Festive Sangeet & Dhol Song)
          ====================================================================== -->
-    <section id="ch3-carnival" class="couture-chapter">
+    <section id="ch3-carnival" class="couture-chapter" data-chapter-index="2">
       <img class="chapter-bg-ambient" src="assets/couture/bg_act3_carnival.webp" alt="" aria-hidden="true" />
       <img class="chapter-bg-main" src="assets/couture/bg_act3_carnival.webp" alt="Festive palace pergola decorated with marigolds" loading="lazy" />
       <div class="chapter-veil" aria-hidden="true"></div>
 
-      <!-- Volumetric Gulal Powder Cannon Canvas -->
       <canvas id="gulal-carnival-canvas" aria-hidden="true"></canvas>
 
-      <!-- 5 Multi-Depth Twirling Rajasthani Marigold Parasols -->
       <div class="parasols-canopy-row" aria-hidden="true">
         <img class="hanging-parasol" src="assets/couture/layer_parasol.webp" alt="" loading="lazy" />
         <img class="hanging-parasol" src="assets/couture/layer_parasol.webp" alt="" loading="lazy" />
@@ -491,7 +472,7 @@
       </div>
 
       <div class="ch3-container">
-        <div class="couture-card sangeet-header-card reveal-up">
+        <div class="couture-card royal-shimmer-card sangeet-header-card reveal-up">
           <div class="tutari-pair-row">
             <button type="button" class="tutari-horn-btn" title="Sound Royal Tutari Fanfare" aria-label="Sound left Tutari horn">
               <img src="assets/couture/layer_tutari_left.webp" alt="" loading="lazy" />
@@ -500,59 +481,57 @@
               <p class="eyebrow-royal"
                  data-en="Day One &nbsp;·&nbsp; Tuesday, 24th November 2026"
                  data-ne="पहिलो दिन &nbsp;·&nbsp; मंगलवार, २४ नोभेम्बर २०२६">Day One &nbsp;·&nbsp; Tuesday, 24th November 2026</p>
-              <p style="font-family:var(--font-royal); font-weight:800; font-size:12px; letter-spacing:4px; color:#B86214; margin-top:4px;"
-                 data-en="✦ &nbsp; 8 MANGSIR 2083 · VIBE ON &nbsp; ✦"
-                 data-ne="✦ &nbsp; ८ मंसिर २०८३ · उत्सवको रौनक &nbsp; ✦">✦ &nbsp; 8 MANGSIR 2083 · VIBE ON &nbsp; ✦</p>
+              <p style="font-family:var(--font-royal); font-weight:800; font-size:11.5px; letter-spacing:3.5px; color:#B86214; margin-top:4px;"
+                 data-en="✦ &nbsp; 8 MANGSIR 2083 &nbsp; ✦"
+                 data-ne="✦ &nbsp; ८ मंसिर २०८३ &nbsp; ✦">✦ &nbsp; 8 MANGSIR 2083 &nbsp; ✦</p>
             </div>
             <button type="button" class="tutari-horn-btn" title="Sound Royal Tutari Fanfare" aria-label="Sound right Tutari horn">
               <img src="assets/couture/layer_tutari_right.webp" alt="" loading="lazy" />
             </button>
           </div>
 
-          <h2 class="script-display" style="font-size: clamp(42px, 4.6vw, 66px); color: #961B3C;"
+          <h2 class="script-display gold-shimmer-title" style="font-size: clamp(42px, 4.6vw, 66px); color: #961B3C;"
               data-en="Haldi, Mehendi &amp; Sangeet Night"
               data-ne="हल्दी, मेहन्दी तथा संगीत साँझ">Haldi, Mehendi &amp; Sangeet Night</h2>
 
           <div class="Carnival-badge-row">
-            <span class="carnival-pill haldi" data-en="🌼 Haldi Hues" data-ne="🌼 हल्दी उत्सव">🌼 Haldi Hues</span>
-            <span class="carnival-pill mehendi" data-en="🌿 Mehendi Art" data-ne="🌿 मेहन्दी रौनक">🌿 Mehendi Art</span>
+            <span class="carnival-pill haldi" data-en="🌼 Haldi" data-ne="🌼 हल्दी">🌼 Haldi</span>
+            <span class="carnival-pill mehendi" data-en="🌿 Mehendi" data-ne="🌿 मेहन्दी">🌿 Mehendi</span>
             <span class="carnival-pill sangeet" data-en="🎤 Sangeet &amp; Live Concert" data-ne="🎤 संगीत र लाइभ कन्सर्ट">🎤 Sangeet &amp; Live Concert</span>
           </div>
 
           <svg class="gold-divider-svg" aria-hidden="true"><use href="#goldDivider" /></svg>
 
-          <p class="serif-display" style="font-size: clamp(19px, 2.5vw, 27px); color: var(--wine-royal);"
+          <p class="serif-display" style="font-size: clamp(20px, 2.5vw, 28px); color: var(--wine-royal);"
              data-en="6:00 PM ONWARDS"
              data-ne="साँझ ६:०० बजेदेखि">6:00 PM ONWARDS</p>
 
-          <p class="serif-display" style="font-size: clamp(15px, 1.9vw, 20px); color: #7C4B14; margin-top: 6px;"
+          <p class="serif-display" style="font-size: clamp(14.5px, 1.8vw, 19px); color: #7C4B14; margin-top: 6px;"
              data-en="Mithila Awadh Dharmashala, Bajrang Chowk–8, Janakpur Dham"
              data-ne="मिथिला अवध धर्मशाला, बजरंग चोक–८, जनकपुरधाम">Mithila Awadh Dharmashala, Bajrang Chowk–8, Janakpur Dham</p>
 
-          <p class="editorial-lead" style="margin-top: 8px;"
+          <p class="editorial-lead" style="margin-top: 6px;"
              data-en="“Pastel hues, dhol beats &amp; live concert under the stars”"
              data-ne="“मनमोहक रंग, ढोलको ताल र ताराहरूमुनि सांगीतिक साँझ”">“Pastel hues, dhol beats &amp; live concert under the stars”</p>
 
-          <!-- Interactive Gulal Colour Cannon & Dhol Controls -->
           <div class="carnival-interactive-bar">
-            <button type="button" class="gulal-swatch-btn" data-col="0" style="background:#FFB703;" title="Haldi Gold Gulal" aria-label="Throw Haldi Gold Gulal"></button>
-            <button type="button" class="gulal-swatch-btn" data-col="1" style="background:#E84A8A;" title="Sangeet Rani Gulal" aria-label="Throw Sangeet Rani Pink Gulal"></button>
-            <button type="button" class="gulal-swatch-btn" data-col="2" style="background:#40C092;" title="Mehendi Mint Gulal" aria-label="Throw Mehendi Mint Gulal"></button>
-            <button type="button" class="gulal-swatch-btn" data-col="3" style="background:#FF7E5F;" title="Coral Peach Gulal" aria-label="Throw Coral Peach Gulal"></button>
+            <button type="button" class="gulal-swatch-btn" data-col="0" style="background:#FFB703;" aria-label="Haldi Gold Gulal"></button>
+            <button type="button" class="gulal-swatch-btn" data-col="1" style="background:#E84A8A;" aria-label="Sangeet Rani Gulal"></button>
+            <button type="button" class="gulal-swatch-btn" data-col="2" style="background:#40C092;" aria-label="Mehendi Mint Gulal"></button>
+            <button type="button" class="gulal-swatch-btn" data-col="3" style="background:#FF7E5F;" aria-label="Coral Peach Gulal"></button>
 
             <button type="button" id="throw-all-gulal-btn" class="btn-gold-outline">
               <span>🎨</span>
-              <span data-en="Splash Gulal!" data-ne="रंग उडाउनुहोस्!">Splash Gulal!</span>
+              <span data-en="Splash Colours" data-ne="रंग उडाउनुहोस्">Splash Colours</span>
             </button>
 
             <button type="button" id="beat-dhol-btn" class="btn-royal">
               <span>🥁</span>
-              <span data-en="Beat the Dhol!" data-ne="ढोल बजाउनुहोस्!">Beat the Dhol!</span>
+              <span data-en="Beat Dhol!" data-ne="ढोल बजाउनुहोस्!">Beat Dhol!</span>
             </button>
           </div>
         </div>
 
-        <!-- 2D Puppet-Animated Dhol & 5 Sangeet Dancers -->
         <div class="dancers-stage-wrap reveal-up delay-2">
           <canvas id="sangeet-dancers-canvas" width="900" height="516" title="Tap the dancers to boost the Dhol beat!" aria-label="Five festive Sangeet dancers celebrating to Dhol beats"></canvas>
         </div>
@@ -560,14 +539,13 @@
     </section>
 
     <!-- ======================================================================
-         CHAPTER 4: THE WEDDING · SHUBH VIVAH (25 NOVEMBER 2026)
+         SEGMENT 4: THE WEDDING · SHUBH VIVAH (Plays Auspicious Shubh Vivah Song)
          ====================================================================== -->
-    <section id="ch4-vivah" class="couture-chapter">
+    <section id="ch4-vivah" class="couture-chapter" data-chapter-index="3">
       <img class="chapter-bg-ambient" src="assets/couture/bg_act4_mandap.webp" alt="" aria-hidden="true" />
-      <img class="chapter-bg-main" src="assets/couture/bg_act4_mandap.webp" alt="Royal palace wedding mandap adorned with roses and peacock fans" loading="lazy" />
+      <img class="chapter-bg-main" src="assets/couture/bg_act4_mandap.webp" alt="Royal palace wedding mandap adorned with roses" loading="lazy" />
       <div class="chapter-veil" aria-hidden="true"></div>
 
-      <!-- 4 Multi-Depth Swinging Crystal Chandeliers -->
       <div class="chandeliers-row" aria-hidden="true">
         <img class="crystal-chandelier" src="assets/couture/layer_chandelier.webp" alt="" loading="lazy" />
         <img class="crystal-chandelier mid" src="assets/couture/layer_chandelier.webp" alt="" loading="lazy" />
@@ -576,29 +554,23 @@
       </div>
 
       <div class="ch4-grid">
-        <!-- Left: Couture Wedding Schedule & Interactive 7 Saptapadi Blessings -->
-        <div class="couture-card reveal-up" style="text-align:center;">
+        <div class="couture-card royal-shimmer-card reveal-up" style="text-align:center;">
           <p class="eyebrow-royal"
-             data-en="Day Two &nbsp;·&nbsp; Tale Of Two Hearts"
-             data-ne="दोस्रो दिन &nbsp;·&nbsp; दुई मुटुको अमर कथा">Day Two &nbsp;·&nbsp; Tale Of Two Hearts</p>
+             data-en="Day Two &nbsp;·&nbsp; Shubh Vivah"
+             data-ne="दोस्रो दिन &nbsp;·&nbsp; पावन शुभ विवाह">Day Two &nbsp;·&nbsp; Shubh Vivah</p>
 
-          <p class="editorial-lead" style="margin-top: 4px;"
-             data-en="“In the name of love, we begin our forever”"
-             data-ne="“प्रेम र आस्थाका साथ हाम्रो अनन्त यात्राको शुभारम्भ”">“In the name of love, we begin our forever”</p>
-
-          <h2 class="script-display" style="font-size: clamp(54px, 7vw, 88px); color: #7A1230; margin: 4px 0;"
+          <h2 class="script-display gold-shimmer-title" style="font-size: clamp(54px, 6.8vw, 86px); color: #7A1230; margin: 4px 0;"
               data-en="The Wedding"
               data-ne="शुभ विवाह समारोह">The Wedding</h2>
 
-          <p class="serif-display" style="font-size: clamp(17px, 2.2vw, 24px); color: var(--wine-royal); letter-spacing: 2.5px;"
+          <p class="serif-display" style="font-size: clamp(16.5px, 2.1vw, 23px); color: var(--wine-royal); letter-spacing: 2.5px;"
              data-en="WEDNESDAY, 25TH NOVEMBER 2026"
              data-ne="बुधवार, २५ नोभेम्बर २०२६">WEDNESDAY, 25TH NOVEMBER 2026</p>
 
           <p class="editorial-lead" style="color: var(--gold-deep); margin-top: 2px;"
-             data-en="9 Mangsir 2083 &nbsp;·&nbsp; Shubh Vivah"
-             data-ne="९ मंसिर २०८३ &nbsp;·&nbsp; शुभ विवाह">9 Mangsir 2083 &nbsp;·&nbsp; Shubh Vivah</p>
+             data-en="9 Mangsir 2083 &nbsp;·&nbsp; “In the name of love, we begin our forever”"
+             data-ne="९ मंसिर २०८३ &nbsp;·&nbsp; “प्रेम र आस्थाका साथ अनन्त यात्राको शुभारम्भ”">9 Mangsir 2083 &nbsp;·&nbsp; “In the name of love, we begin our forever”</p>
 
-          <!-- Symmetrical Two-Column Timings from Finalized Bride Card -->
           <div class="vivah-schedule-box">
             <div class="vivah-time-col">
               <div class="vivah-time-label" data-en="PREETI BHOJ" data-ne="प्रीति भोज">PREETI BHOJ</div>
@@ -611,34 +583,23 @@
             </div>
           </div>
 
-          <p class="body-copy" style="font-size: clamp(15px, 1.6vw, 18px); color: var(--ink-muted);"
-             data-en="Followed by Varmala &amp; auspicious Shubh Vivah Mandap rituals"
-             data-ne="त्यसपश्चात् वरमाला तथा पावन शुभ विवाह मण्डप विधि">Followed by Varmala &amp; auspicious Shubh Vivah Mandap rituals</p>
-
-          <svg class="gold-divider-svg" aria-hidden="true"><use href="#goldDivider" /></svg>
-
-          <p class="serif-display" style="font-size: clamp(16px, 1.9vw, 21px);"
+          <p class="serif-display" style="font-size: clamp(15.5px, 1.8vw, 20px);"
              data-en="MITHILA AWADH DHARMASHALA"
              data-ne="मिथिला अवध धर्मशाला">MITHILA AWADH DHARMASHALA</p>
-          <p class="editorial-lead" style="font-size: clamp(16px, 1.8vw, 19px);"
-             data-en="Bajrang Chowk–8, Janakpur Dham, Nepal"
-             data-ne="बजरंग चोक–८, जनकपुरधाम, नेपाल">Bajrang Chowk–8, Janakpur Dham, Nepal</p>
+          <p class="editorial-lead" style="font-size: clamp(15.5px, 1.7vw, 18.5px);"
+             data-en="Bajrang Chowk–8, Opposite Janaki Health Care Hospital, Janakpur Dham"
+             data-ne="बजरंग चोक–८, जानकी हेल्थ केयर अस्पतालको अगाडि, जनकपुरधाम">Bajrang Chowk–8, Opposite Janaki Health Care Hospital, Janakpur Dham</p>
 
-          <!-- Interactive 7 Saptapadi Sacred Lotus Petals -->
           <div class="saptapadi-box">
-            <p class="eyebrow-royal" style="font-size: 10.5px;"
-               data-en="Seven Sacred Saptapadi Wishes · Touch Each Lotus Petal"
-               data-ne="सप्तपदीका सात पवित्र आशीर्वाद · कमलको पंखुडी छुनुहोस्">Seven Sacred Saptapadi Wishes · Touch Each Lotus Petal</p>
             <div id="saptapadi-petals" class="saptapadi-petals"></div>
             <p id="saptapadi-quote" class="saptapadi-quote" aria-live="polite"></p>
           </div>
         </div>
 
-        <!-- Right: Royal Bridal Couple Standing at the Mandap -->
         <div class="mandap-couple-stage reveal-up delay-2">
           <svg class="mandap-aura-svg" viewBox="0 0 700 700" aria-hidden="true">
-            <circle cx="350" cy="350" r="330" fill="url(#sacredSunGlow)" opacity="0.86" />
-            <g id="ch4-aura-rays" class="spin-rays" opacity="0.54"></g>
+            <circle cx="350" cy="350" r="330" fill="url(#sacredSunGlow)" opacity="0.88" />
+            <g id="ch4-aura-rays" class="spin-rays" opacity="0.56"></g>
             <g class="spin-cw">
               <circle cx="350" cy="350" r="268" fill="none" stroke="url(#goldFoil)" stroke-width="2" stroke-dasharray="8 8" opacity="0.75" />
               <circle cx="350" cy="350" r="222" fill="none" stroke="url(#goldFoil)" stroke-width="1.4" opacity="0.65" />
@@ -652,9 +613,9 @@
     </section>
 
     <!-- ======================================================================
-         CHAPTER 5: COMPLETE ITINERARY AT A GLANCE, VENUE MAP & JANAKPUR GUIDE
+         SEGMENT 5: VENUE, MAP & JANAKPUR CONCIERGE (Plays Soulful Instrumental)
          ====================================================================== -->
-    <section id="ch5-venue" class="couture-chapter">
+    <section id="ch5-venue" class="couture-chapter" data-chapter-index="4">
       <img class="chapter-bg-ambient" src="assets/couture/bg_act2_courtyard.webp" alt="" aria-hidden="true" />
       <img class="chapter-bg-main" src="assets/couture/bg_act5_driveway.webp" alt="Royal Janakpur palace courtyard driveway" loading="lazy" />
       <div class="chapter-veil" aria-hidden="true"></div>
@@ -662,96 +623,84 @@
       <div class="ch5-wrapper">
         <div style="text-align:center;" class="reveal-up">
           <p class="eyebrow-royal"
-             data-en="In The Sacred Heart Of Mithila"
-             data-ne="मिथिलाको पावन भूमिमा">In The Sacred Heart Of Mithila</p>
-          <h2 class="script-display" style="font-size: clamp(48px, 6.2vw, 76px); margin-top: 4px;"
-              data-en="Celebration Itinerary &amp; Venue"
-              data-ne="समारोह तालिका तथा स्थल">Celebration Itinerary &amp; Venue</h2>
+             data-en="Sacred Land Of Janakpur Dham"
+             data-ne="मिथिलाको पावन भूमि जनकपुरधाम">Sacred Land Of Janakpur Dham</p>
+          <h2 class="script-display gold-shimmer-title" style="font-size: clamp(46px, 6vw, 74px); margin-top: 2px;"
+              data-en="Celebrations &amp; Venue Guide"
+              data-ne="समारोह तालिका तथा स्थल">Celebrations &amp; Venue Guide</h2>
         </div>
 
-        <!-- Strictly the 2 Confirmed Celebrations: Haldi/Mehendi/Sangeet + Shubh Vivah -->
         <div class="itinerary-duo-grid reveal-up delay-1">
           <article class="couture-card itinerary-summary-card">
             <span class="day-pill-tag day1"
-                  data-en="TUESDAY · 24 NOVEMBER 2026 (8 MANGSIR 2083)"
-                  data-ne="मंगलवार · २४ नोभेम्बर २०२६ (८ मंसिर २०८३)">TUESDAY · 24 NOVEMBER 2026 (8 MANGSIR 2083)</span>
-            <h3 class="serif-display" style="font-size: clamp(21px, 2.4vw, 27px); color: #8C4A08;"
+                  data-en="TUE · 24 NOV 2026 (8 MANGSIR 2083)"
+                  data-ne="मंगलवार · २४ नोभेम्बर २०२६ (८ मंसिर २०८३)">TUE · 24 NOV 2026 (8 MANGSIR 2083)</span>
+            <h3 class="serif-display" style="font-size: clamp(20px, 2.3vw, 26px); color: #8C4A08;"
                 data-en="Haldi, Mehendi &amp; Sangeet Night"
                 data-ne="हल्दी, मेहन्दी र संगीत साँझ">Haldi, Mehendi &amp; Sangeet Night</h3>
             <p class="body-copy" style="margin-top: 8px;"
-               data-en="<strong>Time:</strong> 6:00 PM Onwards<br><strong>Highlights:</strong> Festive Haldi &amp; Mehendi rituals, dhol beats, dancing, and live musical concert under the stars.<br><strong>Venue:</strong> Mithila Awadh Dharmashala, Bajrang Chowk–8, Janakpur Dham."
-               data-ne="<strong>समय:</strong> साँझ ६:०० बजेदेखि<br><strong>आकर्षण:</strong> हल्दी र मेहन्दी रस्म, ढोलको ताल, नृत्य र ताराहरूमुनि लाइभ सांगीतिक कन्सर्ट।<br><strong>स्थान:</strong> मिथिला अवध धर्मशाला, बजरंग चोक–८, जनकपुरधाम।">
-              <strong>Time:</strong> 6:00 PM Onwards<br /><strong>Highlights:</strong> Festive Haldi &amp; Mehendi rituals, dhol beats, dancing, and live musical concert under the stars.<br /><strong>Venue:</strong> Mithila Awadh Dharmashala, Bajrang Chowk–8, Janakpur Dham.
+               data-en="<strong>6:00 PM Onwards</strong> · Pastel hues, dhol beats &amp; live concert under the stars at <strong>Mithila Awadh Dharmashala</strong>, Bajrang Chowk–8, Janakpur Dham."
+               data-ne="<strong>साँझ ६:०० बजेदेखि</strong> · हल्दी-मेहन्दी रस्म, ढोलको ताल र ताराहरूमुनि लाइभ सांगीतिक साँझ · <strong>मिथिला अवध धर्मशाला</strong>, बजरंग चोक–८, जनकपुरधाम।">
+              <strong>6:00 PM Onwards</strong> · Pastel hues, dhol beats &amp; live concert under the stars at <strong>Mithila Awadh Dharmashala</strong>, Bajrang Chowk–8, Janakpur Dham.
             </p>
           </article>
 
           <article class="couture-card itinerary-summary-card">
             <span class="day-pill-tag day2"
-                  data-en="WEDNESDAY · 25 NOVEMBER 2026 (9 MANGSIR 2083)"
-                  data-ne="बुधवार · २५ नोभेम्बर २०२६ (९ मंसिर २०८३)">WEDNESDAY · 25 NOVEMBER 2026 (9 MANGSIR 2083)</span>
-            <h3 class="serif-display" style="font-size: clamp(21px, 2.4vw, 27px); color: var(--wine-royal);"
+                  data-en="WED · 25 NOV 2026 (9 MANGSIR 2083)"
+                  data-ne="बुधवार · २५ नोभेम्बर २०२६ (९ मंसिर २०८३)">WED · 25 NOV 2026 (9 MANGSIR 2083)</span>
+            <h3 class="serif-display" style="font-size: clamp(20px, 2.3vw, 26px); color: var(--wine-royal);"
                 data-en="The Wedding · Shubh Vivah"
                 data-ne="शुभ विवाह समारोह">The Wedding · Shubh Vivah</h3>
             <p class="body-copy" style="margin-top: 8px;"
-               data-en="<strong>Preeti Bhoj:</strong> 5:00 PM &nbsp;|&nbsp; <strong>Baraat Swagat:</strong> 7:00 PM<br><strong>Highlights:</strong> Grand Baraat welcome, Varmala ceremony &amp; sacred Shubh Vivah rituals.<br><strong>Venue:</strong> Mithila Awadh Dharmashala, Bajrang Chowk–8, Janakpur Dham."
-               data-ne="<strong>प्रीति भोज:</strong> साँझ ५:०० बजे &nbsp;|&nbsp; <strong>बरात स्वागत:</strong> साँझ ७:०० बजे<br><strong>आकर्षण:</strong> भव्य बरात स्वागत, वरमाला समारोह तथा पावन शुभ विवाह विधि।<br><strong>स्थान:</strong> मिथिला अवध धर्मशाला, बजरंग चोक–८, जनकपुरधाम।">
-              <strong>Preeti Bhoj:</strong> 5:00 PM &nbsp;|&nbsp; <strong>Baraat Swagat:</strong> 7:00 PM<br /><strong>Highlights:</strong> Grand Baraat welcome, Varmala ceremony &amp; sacred Shubh Vivah rituals.<br /><strong>Venue:</strong> Mithila Awadh Dharmashala, Bajrang Chowk–8, Janakpur Dham.
+               data-en="<strong>Preeti Bhoj: 5:00 PM</strong> &nbsp;·&nbsp; <strong>Baraat Swagat: 7:00 PM</strong> · Followed by Varmala &amp; auspicious Shubh Vivah rituals at <strong>Mithila Awadh Dharmashala</strong>."
+               data-ne="<strong>प्रीति भोज: ५:०० बजे</strong> &nbsp;·&nbsp; <strong>बरात स्वागत: ७:०० बजे</strong> · वरमाला तथा पावन शुभ विवाह विधि · <strong>मिथिला अवध धर्मशाला</strong>, जनकपुरधाम।">
+              <strong>Preeti Bhoj: 5:00 PM</strong> &nbsp;·&nbsp; <strong>Baraat Swagat: 7:00 PM</strong> · Followed by Varmala &amp; auspicious Shubh Vivah rituals at <strong>Mithila Awadh Dharmashala</strong>.
             </p>
           </article>
         </div>
 
-        <!-- Venue Location Actions & Interactive Janakpur Guest Concierge -->
         <div class="venue-concierge-grid reveal-up delay-2">
           <div class="couture-card">
-            <p class="eyebrow-royal" data-en="Celebration Venue &amp; Directions" data-ne="समारोह स्थल र दिशा">Celebration Venue &amp; Directions</p>
-            <h3 class="serif-display" style="font-size: clamp(20px, 2.4vw, 26px); margin-top: 6px;"
+            <p class="eyebrow-royal" data-en="Venue &amp; Family Desk" data-ne="समारोह स्थल र सम्पर्क">Venue &amp; Family Desk</p>
+            <h3 class="serif-display" style="font-size: clamp(19px, 2.2vw, 25px); margin-top: 6px;"
                 data-en="Mithila Awadh Dharmashala"
                 data-ne="मिथिला अवध धर्मशाला">Mithila Awadh Dharmashala</h3>
-            <p class="body-copy" style="margin-top: 6px;"
+            <p class="body-copy" style="margin-top: 4px;"
                data-en="<em>(Mithila Abadh Sanskritik Sanrakchan Parishad)</em><br>Bajrang Chowk–8, Opposite Janaki Health Care Hospital, Janakpur Dham, Nepal"
                data-ne="<em>(मिथिला अवध सांस्कृतिक संरक्षण परिषद्)</em><br>बजरंग चोक–८, जानकी हेल्थ केयर अस्पतालको अगाडि, जनकपुरधाम, नेपाल">
               <em>(Mithila Abadh Sanskritik Sanrakchan Parishad)</em><br />Bajrang Chowk–8, Opposite Janaki Health Care Hospital, Janakpur Dham, Nepal
             </p>
 
-            <div style="display:flex; flex-wrap:wrap; gap:10px; margin-top:18px;">
+            <div style="display:flex; flex-wrap:wrap; gap:9px; margin-top:16px;">
               <a class="btn-royal"
                  href="https://www.google.com/maps/search/?api=1&query=Mithila+Abadh+Sanskritik+Sanrakchan+Parishad+Bajrang+Chowk+Janakpur+Nepal"
                  target="_blank" rel="noopener noreferrer">
                 <span>📍</span>
-                <span data-en="Open Google Maps ↗" data-ne="गुगल नक्सा हेर्नुहोस् ↗">Open Google Maps ↗</span>
+                <span data-en="Google Maps ↗" data-ne="गुगल नक्सा ↗">Google Maps ↗</span>
               </a>
 
               <button type="button" id="copy-venue-btn" class="btn-gold-outline">
                 <span>📋</span>
-                <span data-en="Copy Address" data-ne="ठेगाना कपी गर्नुहोस्">Copy Address</span>
+                <span data-en="Copy Address" data-ne="ठेगाना कपी">Copy Address</span>
               </button>
 
               <a class="btn-gold-outline" href="tel:+9779745315294">
                 <span>📞</span>
-                <span data-en="Call +977 974-5315294" data-ne="फोन +९७७ ९७४-५३१५२९४">Call +977 974-5315294</span>
-              </a>
-
-              <a class="btn-gold-outline" href="https://wa.me/9779745315294" target="_blank" rel="noopener noreferrer">
-                <span>💬</span>
-                <span data-en="WhatsApp Desk ↗" data-ne="व्हाट्सएप सम्पर्क ↗">WhatsApp Desk ↗</span>
+                <span data-en="+977 974-5315294" data-ne="+९७७ ९७४-५३१५२९४">+977 974-5315294</span>
               </a>
             </div>
           </div>
 
           <div class="couture-card">
-            <p class="eyebrow-royal" style="margin-bottom: 10px;"
-               data-en="Guest Concierge Guide"
-               data-ne="पाहुना सहयोगी जानकारी">Guest Concierge Guide</p>
-
             <div class="guide-tabs-nav" role="tablist">
               <button type="button" class="guide-tab-btn active" data-tab="attire"
-                      data-en="✨ Dress Palette" data-ne="✨ पोशाक सुझाव">✨ Dress Palette</button>
+                      data-en="✨ Attire" data-ne="✨ पोशाक">✨ Attire</button>
               <button type="button" class="guide-tab-btn" data-tab="travel"
-                      data-en="✈️ Getting Here" data-ne="✈️ यात्रा विवरण">✈️ Getting Here</button>
+                      data-en="✈️ Travel" data-ne="✈️ यात्रा">✈️ Travel</button>
               <button type="button" class="guide-tab-btn" data-tab="weather"
                       data-en="🌙 Weather" data-ne="🌙 मौसम">🌙 Weather</button>
             </div>
-
             <div id="guide-tab-content" class="guide-tab-panel" aria-live="polite"></div>
           </div>
         </div>
@@ -759,67 +708,61 @@
     </section>
 
     <!-- ======================================================================
-         CHAPTER 6: VINTAGE GETAWAY CAR FINALE, 5-DIYA AARTI & RSVP STUDIO
+         SEGMENT 6: 3D ROYAL GETAWAY CAR DEPARTURE, 5-DIYA AARTI & RSVP STUDIO
          ====================================================================== -->
-    <section id="ch6-finale" class="couture-chapter">
-      <!-- Scrolling Overhead Palace Driveway from Act V of Finalized Card -->
-      <div class="driveway-parallax-stage" aria-hidden="true">
-        <div class="scrolling-road-track"></div>
-      </div>
+    <section id="ch6-finale" class="couture-chapter" data-chapter-index="5">
+      <img class="chapter-bg-ambient" src="assets/couture/bg_act5_driveway.webp" alt="" aria-hidden="true" />
       <div class="chapter-veil" aria-hidden="true"></div>
 
       <div class="ch6-grid">
-        <!-- Left: Vintage Hand-Painted Lotus Convertible + 5-Diya Aarti Blessing Tray -->
-        <div class="couture-card getaway-car-showcase reveal-up">
-          <p class="script-display" style="font-size: clamp(44px, 5.4vw, 66px); color: #731630;"
-             data-en="Our Forever"
-             data-ne="हाम्रो अनन्त यात्रा">Our Forever</p>
-          <p class="eyebrow-royal" style="letter-spacing: 5px; margin-bottom: 12px;"
-             data-en="STARTS NOW"
-             data-ne="अब सुरु हुँदैछ">STARTS NOW</p>
+        <!-- Left: 3D Perspective Moving Convertible Stage (Bride & Groom Seating -> 3D Drive!) + 5-Diya Thali -->
+        <div class="couture-card royal-shimmer-card getaway-car-showcase reveal-up">
+          <p class="script-display gold-shimmer-title" style="font-size: clamp(42px, 5vw, 62px); color: #731630;"
+             data-en="Our Forever Starts Now"
+             data-ne="हाम्रो अनन्त यात्रा सुरु हुँदैछ">Our Forever Starts Now</p>
 
-          <button type="button" id="getaway-car-btn" class="car-interactive-btn" title="Tap the vintage getaway car to honk!" aria-label="Tap vintage lotus getaway car to honk and celebrate">
-            <img src="assets/couture/layer_getaway_car.webp" alt="Dr. Diksha and Dr. Aashik in a vintage lotus-painted convertible" loading="lazy" />
-          </button>
-          <p style="margin-top:8px; font-family:var(--font-sans); font-size:11px; font-weight:700; color:var(--gold-deep);"
-             data-en="🚗 Tap the vintage car to honk &amp; shower petals!"
-             data-ne="🚗 विन्टेज कारमा छुनुहोस् र पुष्प वर्षा गर्नुहोस्!">🚗 Tap the vintage car to honk &amp; shower petals!</p>
-
-          <svg class="gold-divider-svg" aria-hidden="true"><use href="#goldDivider" /></svg>
-
-          <!-- Interactive 5-Diya Aarti Blessing Thali -->
-          <p class="eyebrow-royal" style="font-size: 11px;"
-             data-en="Light The 5-Diya Blessing Thali"
-             data-ne="५ मङ्गल आरती दीप प्रज्वलित गर्नुहोस्">Light The 5-Diya Blessing Thali</p>
-
-          <div class="diya-thali-row">
-            <button type="button" class="aarti-diya-btn lit" aria-label="Blessing Diya 1"><svg width="34" height="34"><use href="#aartiDiyaSvg"/></svg></button>
-            <button type="button" class="aarti-diya-btn" aria-label="Blessing Diya 2"><svg width="34" height="34"><use href="#aartiDiyaSvg"/></svg></button>
-            <button type="button" class="aarti-diya-btn lit" aria-label="Blessing Diya 3"><svg width="34" height="34"><use href="#aartiDiyaSvg"/></svg></button>
-            <button type="button" class="aarti-diya-btn" aria-label="Blessing Diya 4"><svg width="34" height="34"><use href="#aartiDiyaSvg"/></svg></button>
-            <button type="button" class="aarti-diya-btn lit" aria-label="Blessing Diya 5"><svg width="34" height="34"><use href="#aartiDiyaSvg"/></svg></button>
+          <!-- Interactive 3D Perspective Royal Palace Boulevard & Moving Couple Convertible -->
+          <div id="getaway-3d-viewport" class="getaway-3d-viewport" role="button" tabindex="0"
+               aria-label="3D royal convertible with Dr. Diksha and Dr. Aashik driving down the palace boulevard. Tap to honk and boost!">
+            <canvas id="getaway-3d-canvas" width="760" height="460"></canvas>
+            <div id="car-3d-status-badge" class="car-3d-status-badge"
+                 data-en="✨ Just Married · Dr. Diksha &amp; Dr. Aashik"
+                 data-ne="✨ शुभ विवाह · डॉ. दीक्षा र डॉ. आशिक">✨ Just Married · Dr. Diksha &amp; Dr. Aashik</div>
           </div>
 
-          <p id="diya-status-label" style="font-family:var(--font-sans); font-size:11.5px; font-weight:700; color:var(--wine-soft); margin-bottom:10px;">3 of 5 Blessing Diyas Lit</p>
+          <div style="display:flex; flex-wrap:wrap; justify-content:center; gap:8px; margin-top:12px;">
+            <button type="button" id="car-honk-boost-btn" class="btn-royal" style="padding:9px 18px; font-size:12px;">
+              <span>🚗</span>
+              <span data-en="Honk &amp; Boost 3D Drive" data-ne="हर्न र ३डी यात्रा">Honk &amp; Boost 3D Drive</span>
+            </button>
+            <button type="button" id="car-replay-boarding-btn" class="btn-gold-outline" style="padding:8px 15px; font-size:11.5px;">
+              <span>🎬</span>
+              <span data-en="Replay Couple Boarding" data-ne="बिदाइ दृश्य दोहोर्याउनुहोस्">Replay Couple Boarding</span>
+            </button>
+          </div>
 
-          <button type="button" id="light-all-diyas-btn" class="btn-gold-outline"
-                  data-en="✨ Light All 5 Diyas"
-                  data-ne="✨ पाँचवटै दीप बाल्नुहोस्">✨ Light All 5 Diyas</button>
+          <svg class="gold-divider-svg" style="margin:12px auto 8px;" aria-hidden="true"><use href="#goldDivider" /></svg>
+
+          <!-- Auto-Lighting 5-Diya Aarti Blessing Thali -->
+          <div class="diya-thali-row">
+            <button type="button" class="aarti-diya-btn lit" aria-label="Blessing Diya 1"><svg width="32" height="32"><use href="#aartiDiyaSvg"/></svg></button>
+            <button type="button" class="aarti-diya-btn" aria-label="Blessing Diya 2"><svg width="32" height="32"><use href="#aartiDiyaSvg"/></svg></button>
+            <button type="button" class="aarti-diya-btn lit" aria-label="Blessing Diya 3"><svg width="32" height="32"><use href="#aartiDiyaSvg"/></svg></button>
+            <button type="button" class="aarti-diya-btn" aria-label="Blessing Diya 4"><svg width="32" height="32"><use href="#aartiDiyaSvg"/></svg></button>
+            <button type="button" class="aarti-diya-btn lit" aria-label="Blessing Diya 5"><svg width="32" height="32"><use href="#aartiDiyaSvg"/></svg></button>
+          </div>
+          <p id="diya-status-label" style="font-family:var(--font-sans); font-size:11px; font-weight:700; color:var(--wine-soft);">5 of 5 Blessing Diyas Lit</p>
         </div>
 
-        <!-- Right: Interactive RSVP & Personal Blessing Composer -->
-        <div class="couture-card reveal-up delay-2" style="text-align:center;">
+        <!-- Right: Clean, Effortless WhatsApp RSVP & Blessing Studio -->
+        <div class="couture-card royal-shimmer-card reveal-up delay-2" style="text-align:center;">
           <p class="eyebrow-royal"
              data-en="Your Presence Is Our Greatest Blessing"
              data-ne="तपाईंको उपस्थिति नै हाम्रो अमूल्य उपहार">Your Presence Is Our Greatest Blessing</p>
 
-          <h2 class="script-display" style="font-size: clamp(42px, 5vw, 62px); margin: 4px 0;"
+          <h2 class="script-display gold-shimmer-title" style="font-size: clamp(42px, 5vw, 62px); margin: 4px 0;"
               data-en="RSVP &amp; Send a Blessing"
-              data-ne="उपस्थिति र शुभकामना पठाउनुहोस्">RSVP &amp; Send a Blessing</h2>
-
-          <p class="editorial-lead" style="font-size: clamp(16.5px, 1.9vw, 20px);"
-             data-en="Can’t wait to celebrate with you in Janakpur Dham!"
-             data-ne="जनकपुरधाममा तपाईंहरूसँगै खुसी साट्न हामी आतुर छौँ!">Can’t wait to celebrate with you in Janakpur Dham!</p>
+              data-ne="उपस्थिति र शुभकामना">RSVP &amp; Send a Blessing</h2>
 
           <form id="rsvp-studio-form" class="rsvp-form-grid">
             <div class="rsvp-field">
@@ -867,11 +810,11 @@
             </div>
 
             <div class="rsvp-field full-span">
-              <label for="rsvp-message" data-en="Personal Blessing for Diksha &amp; Aashik" data-ne="वर-वधुका लागि शुभकामना सन्देश">Personal Blessing for Diksha &amp; Aashik</label>
+              <label for="rsvp-message" data-en="Personal Blessing" data-ne="शुभकामना सन्देश">Personal Blessing</label>
               <textarea id="rsvp-message" class="rsvp-input" rows="2"
                         placeholder="Write a warm wish or tap a blessing below…"
                         data-placeholder-en="Write a warm wish or tap a blessing below…"
-                        data-placeholder-ne="आफ्नो शुभकामना लेख्नुहोस् वा तलको बटन छान्नुहोस्…"></textarea>
+                        data-placeholder-ne="आफ्नो शुभकामना लेख्नुहोस् वा तल छान्नुहोस्…"></textarea>
               <div class="quick-blessing-chips">
                 <button type="button" class="blessing-chip"
                         data-msg-en="Wishing Dr. Diksha & Dr. Aashik a lifetime of love, laughter & endless joy!"
@@ -881,7 +824,7 @@
                 <button type="button" class="blessing-chip"
                         data-msg-en="So excited to dance at Sangeet & celebrate your Shubh Vivah in Janakpur Dham!"
                         data-msg-ne="जनकपुरधाममा संगीत र शुभ विवाहमा सँगै रमाउन निकै उत्साहित छौँ!">
-                  🥁 Excited for Janakpur!
+                  🥁 See you in Janakpur!
                 </button>
                 <button type="button" class="blessing-chip"
                         data-msg-en="May Lord Ganesha bless your new journey together with harmony and prosperity."
@@ -891,33 +834,33 @@
               </div>
             </div>
 
-            <div class="rsvp-field full-span" style="margin-top: 6px;">
-              <button type="submit" class="btn-royal" style="width:100%; padding: 14px 24px; font-size: 13.5px;">
+            <div class="rsvp-field full-span" style="margin-top: 4px;">
+              <button type="submit" class="btn-royal" style="width:100%; padding: 13px 22px; font-size: 13px;">
                 <span>💬</span>
-                <span data-en="Send RSVP &amp; Blessing via WhatsApp ↗" data-ne="व्हाट्सएप मार्फत उपस्थिति र शुभकामना पठाउनुहोस् ↗">Send RSVP &amp; Blessing via WhatsApp ↗</span>
+                <span data-en="Send RSVP &amp; Blessing via WhatsApp ↗" data-ne="व्हाट्सएप मार्फत पठाउनुहोस् ↗">Send RSVP &amp; Blessing via WhatsApp ↗</span>
               </button>
             </div>
           </form>
 
           <p id="rsvp-confirmation-note" hidden style="margin-top:10px; font-family:var(--font-sans); font-size:12px; font-weight:700; color:#166534;"></p>
 
-          <div style="display:flex; flex-wrap:wrap; justify-content:center; gap:10px; margin-top:16px;">
+          <div style="display:flex; flex-wrap:wrap; justify-content:center; gap:9px; margin-top:14px;">
             <button type="button" id="share-invite-btn" class="btn-gold-outline">
               <span>🔗</span>
-              <span data-en="Share Invitation" data-ne="निमन्त्रणा साझा गर्नुहोस्">Share Invitation</span>
+              <span data-en="Share Invitation" data-ne="निमन्त्रणा साझा">Share Invitation</span>
             </button>
             <button type="button" id="replay-gate-btn" class="btn-gold-outline">
               <span>↺</span>
-              <span data-en="Replay Royal Gate Opening" data-ne="मुख्य द्वार फेरि खोल्नुहोस्">Replay Royal Gate Opening</span>
+              <span data-en="Replay Opening" data-ne="सुरुदेखि हेर्नुहोस्">Replay Opening</span>
             </button>
           </div>
 
-          <svg class="gold-divider-svg" aria-hidden="true"><use href="#goldDivider" /></svg>
+          <svg class="gold-divider-svg" style="margin:12px auto 8px;" aria-hidden="true"><use href="#goldDivider" /></svg>
 
-          <p class="serif-display" style="font-size: clamp(16px, 2vw, 20px);"
+          <p class="serif-display" style="font-size: clamp(15px, 1.9vw, 19px);"
              data-en="With Love · Dr. Diksha Mishra &amp; Dr. Aashik Jha"
              data-ne="सप्रेम · डॉ. दीक्षा मिश्र र डॉ. आशिक झा">With Love · Dr. Diksha Mishra &amp; Dr. Aashik Jha</p>
-          <p style="font-family:var(--font-editorial); font-weight:600; font-size:15.5px; color:var(--ink-muted); margin-top:4px;"
+          <p style="font-family:var(--font-editorial); font-weight:600; font-size:15px; color:var(--ink-muted); margin-top:3px;"
              data-en="Hosted with love by Dipendra Mishra &amp; Nilam Mishra · #DikshaWedsAashik"
              data-ne="दर्शनाभिलाषी: दिपेन्द्र मिश्र तथा नीलम मिश्र · #DikshaWedsAashik">
             Hosted with love by Dipendra Mishra &amp; Nilam Mishra · #DikshaWedsAashik

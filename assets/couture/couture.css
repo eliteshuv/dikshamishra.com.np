@@ -40,6 +40,7 @@
 
 html {
   scroll-behavior: smooth;
+  scroll-snap-type: y proximity;
   background: var(--ivory-warm);
   color: var(--wine-royal);
   font-family: var(--font-editorial);
@@ -394,6 +395,21 @@ img {
   opacity: 1;
 }
 
+.gate-auto-status {
+  margin-top: 10px;
+  font-family: var(--font-sans);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  color: var(--gold-deep);
+  opacity: 0.9;
+}
+
+#gate-auto-ring {
+  transition: stroke-dashoffset 0.08s linear;
+}
+
 /* ==========================================================================
    PERSISTENT FLOATING ROYAL HEADER & CHAPTER DOCK
    ========================================================================== */
@@ -489,6 +505,18 @@ img {
   background: linear-gradient(135deg, #5A0F24, #841834);
   color: #FFF6DC;
   border-color: var(--gold-foil);
+}
+
+.hud-pill.active-auto {
+  background: linear-gradient(135deg, #FCE8A6 0%, #D99E32 100%);
+  color: #3D0818;
+  border-color: #FFF3C4;
+  font-weight: 800;
+  box-shadow: 0 6px 18px rgba(217, 158, 50, 0.35);
+}
+
+.auto-ring-svg {
+  flex-shrink: 0;
 }
 
 /* 4-Bar Animated Equalizer Inside Music Pill */
@@ -609,13 +637,14 @@ img {
 .couture-chapter {
   position: relative;
   min-height: 100svh;
+  scroll-snap-align: start;
   width: 100%;
   overflow: hidden;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  padding: clamp(86px, 11vh, 116px) clamp(16px, 4vw, 48px) clamp(88px, 11vh, 112px);
+  padding: clamp(82px, 10vh, 110px) clamp(14px, 3.8vw, 46px) clamp(86px, 10.5vh, 108px);
   isolation: isolate;
 }
 
@@ -729,6 +758,33 @@ img {
   border-radius: 23px;
   border: 1px dashed rgba(201, 144, 44, 0.36);
   pointer-events: none;
+}
+
+.royal-shimmer-card {
+  overflow: hidden;
+}
+
+.royal-shimmer-card::after {
+  content: "";
+  position: absolute;
+  top: -50%;
+  left: -120%;
+  width: 65%;
+  height: 200%;
+  background: linear-gradient(
+    115deg,
+    transparent 20%,
+    rgba(255, 249, 224, 0.52) 50%,
+    transparent 80%
+  );
+  transform: rotate(18deg);
+  pointer-events: none;
+  animation: royalCardSheen 7.5s ease-in-out infinite;
+}
+
+@keyframes royalCardSheen {
+  0%, 55% { left: -120%; }
+  100% { left: 165%; }
 }
 
 /* Reveal-on-scroll Stagger System */
@@ -1565,48 +1621,24 @@ img {
 }
 
 /* ==========================================================================
-   CHAPTER 6: VINTAGE GETAWAY CAR FINALE, AARTI DIYA TRAY & RSVP STUDIO
+   CHAPTER 6: 3D PERSPECTIVE ROYAL GETAWAY CAR, 5-DIYA THALI & RSVP STUDIO
    ========================================================================== */
 #ch6-finale {
-  background: #F9EFE4;
-  padding-bottom: clamp(108px, 14vh, 136px);
-}
-
-.driveway-parallax-stage {
-  position: absolute;
-  inset: 0;
-  overflow: hidden;
-  z-index: -1;
-  pointer-events: none;
-}
-
-.scrolling-road-track {
-  position: absolute;
-  inset: -1440px 0 0 0;
-  background-image: url('bg_act5_road_tile.webp');
-  background-repeat: repeat-y;
-  background-position: center top;
-  background-size: min(1080px, 100vw) auto;
-  animation: roadScrollDown 16s linear infinite;
-  opacity: 0.85;
-}
-
-@keyframes roadScrollDown {
-  from { transform: translate3d(0, 0, 0); }
-  to { transform: translate3d(0, 720px, 0); }
+  background: linear-gradient(180deg, #FBF0E4 0%, #F4DFCA 100%);
+  padding-bottom: clamp(104px, 13vh, 132px);
 }
 
 .ch6-grid {
   position: relative;
   z-index: 8;
-  width: min(1160px, 100%);
+  width: min(1180px, 100%);
   display: grid;
-  grid-template-columns: 0.88fr 1.12fr;
+  grid-template-columns: 1.04fr 0.96fr;
   align-items: center;
-  gap: clamp(24px, 4vw, 48px);
+  gap: clamp(22px, 3.5vw, 42px);
 }
 
-/* Vintage Convertible Interactive Stage */
+/* 3D Perspective Royal Palace Boulevard & Moving Couple Convertible Stage */
 .getaway-car-showcase {
   display: flex;
   flex-direction: column;
@@ -1614,48 +1646,71 @@ img {
   text-align: center;
 }
 
-.car-interactive-btn {
+.getaway-3d-viewport {
   position: relative;
-  width: clamp(152px, 18vw, 200px);
-  filter: drop-shadow(0 22px 32px rgba(48, 34, 24, 0.30));
-  animation: carCruiseSway 3.6s ease-in-out infinite alternate;
-  transition: transform 0.25s ease;
+  width: 100%;
+  margin-top: 8px;
+  border-radius: 24px;
+  overflow: hidden;
+  cursor: pointer;
+  border: 2px solid var(--gold-foil);
+  box-shadow:
+    0 18px 40px rgba(68, 16, 28, 0.24),
+    inset 0 0 0 1.5px rgba(255, 250, 236, 0.8);
+  background: linear-gradient(180deg, #FFE4BE 0%, #F7C59F 42%, #DFB48C 100%);
+  perspective: 900px;
+  transform-style: preserve-3d;
+  transition: transform 0.35s cubic-bezier(0.22, 1, 0.36, 1), box-shadow 0.35s ease;
 }
 
-.car-interactive-btn:hover {
-  filter: drop-shadow(0 24px 38px rgba(184, 130, 40, 0.48));
+.getaway-3d-viewport:hover {
+  transform: translateY(-3px) rotateX(1.5deg);
+  box-shadow:
+    0 24px 48px rgba(68, 16, 28, 0.3),
+    0 0 22px rgba(229, 186, 99, 0.55);
 }
 
-.car-interactive-btn.honk-bounce {
-  animation: carHonkPop 0.55s cubic-bezier(0.34, 1.56, 0.64, 1) !important;
+#getaway-3d-canvas {
+  display: block;
+  width: 100%;
+  height: auto;
+  aspect-ratio: 760 / 460;
 }
 
-@keyframes carCruiseSway {
-  0% { transform: translate3d(-4px, 0, 0) rotate(-0.8deg); }
-  100% { transform: translate3d(4px, -6px, 0) rotate(0.8deg); }
-}
-
-@keyframes carHonkPop {
-  0% { transform: scale(1); }
-  35% { transform: scale(1.09) translateY(-8px); }
-  70% { transform: scale(0.97); }
-  100% { transform: scale(1); }
+.car-3d-status-badge {
+  position: absolute;
+  top: 10px;
+  left: 50%;
+  transform: translateX(-50%);
+  padding: 5px 14px;
+  border-radius: 999px;
+  background: rgba(61, 8, 24, 0.82);
+  color: #FFF6DC;
+  border: 1px solid rgba(229, 186, 99, 0.72);
+  backdrop-filter: blur(8px);
+  font-family: var(--font-sans);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.4px;
+  white-space: nowrap;
+  pointer-events: none;
+  box-shadow: 0 6px 16px rgba(35, 6, 14, 0.28);
 }
 
 /* Interactive 5-Diya Aarti Blessing Thali */
 .diya-thali-row {
   display: flex;
   justify-content: center;
-  gap: 14px;
-  margin: 14px 0 8px;
+  gap: 12px;
+  margin: 8px 0 6px;
 }
 
 .aarti-diya-btn {
   position: relative;
-  width: 48px;
-  height: 48px;
+  width: 44px;
+  height: 44px;
   border-radius: 50%;
-  background: radial-gradient(circle, rgba(255, 245, 214, 0.9), rgba(242, 214, 158, 0.6));
+  background: radial-gradient(circle, rgba(255, 245, 214, 0.92), rgba(242, 214, 158, 0.62));
   border: 1.5px solid rgba(184, 130, 40, 0.6);
   display: flex;
   align-items: center;
