@@ -73,16 +73,17 @@ const assert = (c, m) => { if (!c) throw new Error('FAIL: ' + m); };
   ok('single clean URL, no Matkor/Kathmandu/Bidai');
   await page.screenshot({ path: path.join(ROOT, 'preview-portrait-gate.png') });
 
-  await page.waitForTimeout(3300); // never touch: it must open by itself
+  await page.waitForTimeout(1300); // Ultra-fast ~1.08s auto-open!
   let s = await state(page);
-  assert(s.opened && !s.locked, 'gate did not auto-open: ' + JSON.stringify(s));
-  ok('gate auto-opened hands-free (~2.7s)');
+  assert(s.opened && !s.locked, 'gate did not auto-open within 1.3s: ' + JSON.stringify(s));
+  ok('gate auto-opened hands-free in ~1.08s with iOS Duo-blur reveal');
 
-  await page.waitForTimeout(3500);
+  // Wait past the 2.6s Chapter 1 reading warmup + 2.4s of gentle reading auto-scroll
+  await page.waitForTimeout(5000);
   s = await state(page);
-  assert(s.y > 40, 'auto-scroll not moving, y=' + s.y);
+  assert(s.y >= 15 && s.y <= 220, 'auto-scroll pace out of gentle reading range, y=' + s.y);
   assert(s.autoOn, 'auto badge off');
-  ok('auto-scroll cruising (scrollY=' + s.y + ')');
+  ok('gentle reading-paced auto-scroll cruising slowly (scrollY=' + s.y + ')');
 
   if (!s.playing[0]) {
     assert(s.needsTap, 'no sound and no "Tap for Sound" hint: ' + JSON.stringify(s));
@@ -93,6 +94,29 @@ const assert = (c, m) => { if (!c) throw new Error('FAIL: ' + m); };
   }
   assert(s.playing[0], 'Ganesh song not playing after tap: ' + JSON.stringify(s));
   ok('Segment 1 Ganesh song playing: "' + s.label + '"');
+
+  // Verify all 6 tracks are FULL-LENGTH (>48s each, not 11s slices!)
+  const durations = await page.evaluate(async () => {
+    const ids = ['audio-ch1', 'audio-ch2', 'audio-ch3', 'audio-ch4', 'audio-ch5', 'audio-ch6'];
+    const out = [];
+    for (const id of ids) {
+      const a = document.getElementById(id);
+      a.preload = 'auto';
+      a.load();
+      await new Promise((r) => {
+        if (a.readyState >= 1 && Number.isFinite(a.duration) && a.duration > 0) return r();
+        a.addEventListener('loadedmetadata', r, { once: true });
+        setTimeout(r, 2500);
+      });
+      out.push(Math.round(a.duration || 0));
+    }
+    return out;
+  });
+  console.log('Track durations (seconds):', durations);
+  for (let i = 0; i < durations.length; i++) {
+    assert(durations[i] >= 48, `Track ch${i + 1} too short: ${durations[i]}s`);
+  }
+  ok('All 6 chapter tracks are full-length studio songs (' + durations.join('s, ') + 's)');
 
   for (const [id, idx] of [['ch3-carnival', 2], ['ch4-vivah', 3], ['ch6-finale', 5]]) {
     await page.evaluate((i) => window.scrollTo({ top: document.getElementById(i).offsetTop + 10, behavior: 'instant' }), id);
@@ -134,7 +158,7 @@ const assert = (c, m) => { if (!c) throw new Error('FAIL: ' + m); };
   page.on('pageerror', (e) => errors.push('PAGEERROR: ' + e.message));
   page.on('console', (m) => { if (m.type() === 'error') errors.push('CONSOLE: ' + m.text()); });
   await page.goto(base, { waitUntil: 'domcontentloaded' });
-  await page.waitForTimeout(800);
+  await page.waitForTimeout(450);
   await page.click('#gate-enter-music-btn');
   await page.waitForTimeout(1600);
   s = await state(page);
@@ -142,11 +166,35 @@ const assert = (c, m) => { if (!c) throw new Error('FAIL: ' + m); };
   ok('desktop: tap-to-open opens instantly and starts Ganesh song');
   await page.evaluate(() => document.querySelectorAll('img').forEach((i) => (i.loading = 'eager')));
   await page.click('#autoscroll-toggle-btn');
-  for (const id of ['ch1-invocation', 'ch3-carnival', 'ch6-finale']) {
+
+  // Verify Time-Based Theme Switcher (Day / Dusk / Night) & Dual-Event Countdown + Contact Links
+  const contactCheck = await page.evaluate(() => ({
+    hasTel: !!document.querySelector('a[href="tel:+9779745315294"]'),
+    hasWa: !!document.querySelector('a[href^="https://wa.me/9779745315294"]'),
+    hasSms: !!document.querySelector('a[href^="sms:+9779745315294"]'),
+    hasCopyPhone: !!document.getElementById('copy-phone-btn'),
+    hasCopyVenue: !!document.getElementById('copy-venue-btn'),
+    hasCdRings: document.querySelectorAll('.cd-ring-prog').length === 4
+  }));
+  assert(
+    contactCheck.hasTel && contactCheck.hasWa && contactCheck.hasSms && contactCheck.hasCopyPhone && contactCheck.hasCopyVenue && contactCheck.hasCdRings,
+    'Missing contact or countdown elements: ' + JSON.stringify(contactCheck)
+  );
+  ok('All contact methods (Call, WhatsApp, SMS, Copy Phone, Copy Venue) & 4 radial countdown medallions present');
+
+  // Force Day Theme for Day screenshots, then Night Theme for Night screenshot
+  await page.evaluate(() => window.setWeddingTheme && window.setWeddingTheme('day'));
+  for (const id of ['ch2-couple', 'ch5-venue', 'ch6-finale']) {
     await page.evaluate((i) => window.scrollTo({ top: document.getElementById(i).offsetTop, behavior: 'instant' }), id);
-    await page.waitForTimeout(id === 'ch6-finale' ? 2800 : 700);
+    await page.waitForTimeout(id === 'ch6-finale' ? 3400 : 700);
     await page.screenshot({ path: path.join(ROOT, `preview-desktop-${id}.png`) });
   }
+  await page.evaluate(() => window.setWeddingTheme && window.setWeddingTheme('night'));
+  await page.evaluate(() => window.scrollTo({ top: document.getElementById('ch2-couple').offsetTop, behavior: 'instant' }));
+  await page.waitForTimeout(600);
+  await page.screenshot({ path: path.join(ROOT, 'preview-desktop-night-ch2.png') });
+  ok('Day & Night theme screenshots captured');
+
   await page.click('#lang-toggle-btn');
   assert((await page.evaluate(() => document.body.innerText)).includes('डॉ. दीक्षा मिश्र'), 'Nepali toggle');
   ok('desktop: Nepali toggle works');

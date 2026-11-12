@@ -27,8 +27,87 @@
   --font-dev: 'Noto Serif Devanagari', Georgia, serif;
   --font-sans: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
 
-  --card-glass: linear-gradient(145deg, rgba(255, 253, 249, 0.93) 0%, rgba(252, 242, 232, 0.89) 100%);
-  --card-shadow: 0 20px 52px rgba(72, 14, 28, 0.14), 0 2px 12px rgba(184, 130, 40, 0.14), inset 0 0 0 1.5px rgba(255, 255, 255, 0.88);
+  --card-glass: linear-gradient(145deg, rgba(255, 253, 249, 0.94) 0%, rgba(252, 242, 232, 0.90) 100%);
+  --card-shadow: 0 22px 56px rgba(72, 14, 28, 0.15), 0 3px 14px rgba(184, 130, 40, 0.16), inset 0 0 0 1.5px rgba(255, 255, 255, 0.90);
+  --veil-bg: radial-gradient(ellipse at 50% 42%, rgba(255, 252, 246, 0.72) 0%, rgba(253, 244, 234, 0.48) 55%, rgba(248, 232, 218, 0.26) 100%);
+  --bg-img-filter: none;
+}
+
+/* ---------- Time-Based Theme: Golden Dusk (5:00 PM – 7:14 PM) ---------- */
+html[data-theme="dusk"] {
+  --ivory-warm: #FCE8D5;
+  --ivory-blush: #F7D4BC;
+  --card-glass: linear-gradient(145deg, rgba(255, 249, 238, 0.94) 0%, rgba(252, 232, 210, 0.90) 100%);
+  --card-shadow: 0 22px 58px rgba(96, 26, 18, 0.20), 0 4px 18px rgba(218, 132, 36, 0.24), inset 0 0 0 1.5px rgba(255, 244, 218, 0.92);
+  --veil-bg: radial-gradient(ellipse at 50% 42%, rgba(255, 240, 218, 0.68) 0%, rgba(248, 210, 176, 0.44) 55%, rgba(196, 112, 82, 0.26) 100%);
+  --bg-img-filter: sepia(0.14) saturate(1.22) contrast(1.03);
+}
+
+/* ---------- Time-Based Theme: Royal Starry Night (7:15 PM – 5:59 AM) ---------- */
+html[data-theme="night"] {
+  --wine-deep: #FFF5DC;
+  --wine-royal: #FCE8A6;
+  --wine-soft: #F3D292;
+  --vermillion: #FFB870;
+  --gold-deep: #F6CB72;
+  --gold-warm: #E8B858;
+  --gold-foil: #F7D078;
+  --ivory-warm: #16040C;
+  --ivory-blush: #220714;
+  --ink-dark: #FFF6E4;
+  --ink-muted: #E2C29B;
+  --card-glass: linear-gradient(145deg, rgba(44, 8, 22, 0.91) 0%, rgba(26, 4, 14, 0.93) 100%);
+  --card-shadow: 0 24px 64px rgba(0, 0, 0, 0.58), 0 0 28px rgba(229, 186, 99, 0.20), inset 0 0 0 1.5px rgba(247, 208, 120, 0.38);
+  --veil-bg: radial-gradient(ellipse at 50% 42%, rgba(28, 5, 15, 0.56) 0%, rgba(20, 3, 11, 0.66) 58%, rgba(12, 2, 7, 0.78) 100%);
+  --bg-img-filter: brightness(0.68) saturate(1.16) contrast(1.08);
+}
+
+html[data-theme="night"] #royal-topbar {
+  background: linear-gradient(180deg, rgba(22, 4, 12, 0.90) 0%, rgba(22, 4, 12, 0.45) 68%, transparent 100%);
+}
+
+html[data-theme="night"] .brand-crest-btn,
+html[data-theme="night"] .hud-pill:not(.active-music):not(.active-auto):not(.needs-tap) {
+  background: rgba(42, 8, 22, 0.92);
+  color: #FCE8A6;
+  border-color: rgba(247, 208, 120, 0.58);
+}
+
+html[data-theme="night"] .script-display {
+  color: #FFF3C8 !important;
+  text-shadow: 0 2px 22px rgba(229, 186, 99, 0.45);
+}
+
+html[data-theme="night"] .sangeet-header-card {
+  background: linear-gradient(145deg, rgba(48, 10, 25, 0.93), rgba(30, 5, 16, 0.94));
+}
+
+html[data-theme="night"] .vivah-schedule-box {
+  background: linear-gradient(135deg, rgba(58, 11, 28, 0.92), rgba(36, 6, 18, 0.92));
+  border-color: rgba(247, 208, 120, 0.55);
+}
+
+html[data-theme="night"] .vivah-sep::after {
+  background: #2C0716;
+}
+
+html[data-theme="night"] .rsvp-input {
+  background: rgba(24, 4, 13, 0.88);
+  color: #FFF6E4;
+  border-color: rgba(247, 208, 120, 0.45);
+}
+
+html[data-theme="night"] .blessing-chip,
+html[data-theme="night"] .btn-gold-outline,
+html[data-theme="night"] .guide-tab-btn:not(.active),
+html[data-theme="night"] .petal-wish-btn:not(.selected) {
+  background: rgba(52, 10, 26, 0.90);
+  color: #FCE8A6;
+  border-color: rgba(247, 208, 120, 0.55);
+}
+
+html[data-theme="night"] #ch6-finale {
+  background: linear-gradient(180deg, #1C0510 0%, #12030A 100%);
 }
 
 *, *::before, *::after {
@@ -107,6 +186,37 @@ img {
   z-index: 48;
 }
 
+#ios-duo-blur-veil {
+  position: fixed;
+  inset: 0;
+  z-index: 89;
+  pointer-events: none;
+  opacity: 0;
+  backdrop-filter: blur(0px) saturate(1);
+  -webkit-backdrop-filter: blur(0px) saturate(1);
+  background: radial-gradient(circle at 50% 48%, rgba(255, 250, 236, 0.35), rgba(90, 15, 36, 0.16));
+  transition:
+    opacity 0.95s cubic-bezier(0.16, 1, 0.3, 1),
+    backdrop-filter 0.95s cubic-bezier(0.16, 1, 0.3, 1),
+    -webkit-backdrop-filter 0.95s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+body.gate-locked #ios-duo-blur-veil {
+  opacity: 1;
+  backdrop-filter: blur(30px) saturate(1.75) brightness(1.08);
+  -webkit-backdrop-filter: blur(30px) saturate(1.75) brightness(1.08);
+}
+
+body main {
+  transition: transform 1.05s cubic-bezier(0.16, 1, 0.3, 1), filter 0.95s cubic-bezier(0.16, 1, 0.3, 1);
+  transform-origin: 50% 45vh;
+}
+
+body.gate-locked main {
+  transform: scale(1.055);
+  filter: blur(14px) saturate(1.25);
+}
+
 #lens-bloom {
   position: fixed;
   inset: 0;
@@ -137,7 +247,7 @@ img {
 }
 
 /* ==========================================================================
-   3D ROYAL BI-FOLD JHAROKHA GATEFOLD OPENING OVERLAY
+   ULTRA-FAST iOS DUO-BLUR 3D ROYAL BI-FOLD JHAROKHA GATEFOLD OVERLAY
    ========================================================================== */
 #royal-gatefold {
   position: fixed;
@@ -151,14 +261,21 @@ img {
   display: flex;
   align-items: center;
   justify-content: center;
-  background: radial-gradient(circle at 50% 48%, rgba(255, 248, 236, 0.45), rgba(58, 10, 22, 0.55));
-  transition: visibility 0.1s linear 1.85s, opacity 0.55s ease 1.35s;
+  background: radial-gradient(circle at 50% 48%, rgba(255, 248, 236, 0.38), rgba(58, 10, 22, 0.48));
+  backdrop-filter: blur(18px) saturate(1.4);
+  -webkit-backdrop-filter: blur(18px) saturate(1.4);
+  transition:
+    visibility 0.1s linear 1.15s,
+    opacity 0.52s cubic-bezier(0.16, 1, 0.3, 1) 0.58s,
+    backdrop-filter 0.85s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 #royal-gatefold.unfolded {
   pointer-events: none;
   opacity: 0;
   visibility: hidden;
+  backdrop-filter: blur(0px) saturate(1);
+  -webkit-backdrop-filter: blur(0px) saturate(1);
 }
 
 .gate-wing {
@@ -169,8 +286,11 @@ img {
   background: linear-gradient(160deg, #FFFDF9 0%, #F7E7D2 52%, #E8CBA9 100%);
   overflow: hidden;
   backface-visibility: hidden;
-  will-change: transform, filter;
-  transition: transform 1.65s cubic-bezier(0.22, 1, 0.36, 1), filter 1.4s ease;
+  will-change: transform, filter, opacity;
+  transition:
+    transform 1.08s cubic-bezier(0.16, 1, 0.3, 1),
+    filter 0.92s cubic-bezier(0.16, 1, 0.3, 1),
+    opacity 0.88s ease 0.22s;
   box-shadow: 0 24px 70px rgba(45, 8, 18, 0.42);
 }
 
@@ -187,13 +307,15 @@ img {
 }
 
 #royal-gatefold.unfolded #gate-wing-left {
-  transform: rotateY(84deg) scale(1.06);
-  filter: blur(3px);
+  transform: rotateY(88deg) scale(1.12) translateZ(40px);
+  filter: blur(16px) brightness(1.18);
+  opacity: 0;
 }
 
 #royal-gatefold.unfolded #gate-wing-right {
-  transform: rotateY(-84deg) scale(1.06);
-  filter: blur(3px);
+  transform: rotateY(-88deg) scale(1.12) translateZ(40px);
+  filter: blur(16px) brightness(1.18);
+  opacity: 0;
 }
 
 .gate-lattice-svg {
@@ -275,7 +397,8 @@ img {
 }
 
 #royal-gatefold.unfolded #gate-center-hub {
-  transform: scale(1.24) rotate(4deg);
+  transform: scale(1.28) translateZ(90px);
+  filter: blur(18px);
   opacity: 0;
 }
 
@@ -722,7 +845,8 @@ img {
   object-position: center top;
   z-index: -2;
   pointer-events: none;
-  transition: transform 8s ease-out;
+  filter: var(--bg-img-filter);
+  transition: transform 8s ease-out, filter 0.65s ease;
 }
 
 .couture-chapter.in-view .chapter-bg-main {
@@ -734,12 +858,18 @@ img {
   inset: 0;
   z-index: -1;
   pointer-events: none;
-  background: radial-gradient(
-    ellipse at 50% 42%,
-    rgba(255, 252, 246, 0.72) 0%,
-    rgba(253, 244, 234, 0.48) 55%,
-    rgba(248, 232, 218, 0.26) 100%
-  );
+  background: var(--veil-bg);
+  transition: background 0.65s ease;
+}
+
+.flower-interactive-hint {
+  margin-top: 12px;
+  font-family: var(--font-sans);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.4px;
+  color: var(--gold-deep);
+  opacity: 0.88;
 }
 
 /* Couture Typography Primitives */
@@ -1169,42 +1299,193 @@ img {
   margin: 4px 0;
 }
 
-/* Live Royal Countdown Grid */
+/* Live Royal Countdown Meta Bar, Switcher & 3D Gold-Foil Medallion Tiles */
+.countdown-meta-bar {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  margin: 12px 0 6px;
+}
+
+.tod-greeting-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 5px 14px;
+  border-radius: 999px;
+  background: linear-gradient(135deg, rgba(255, 248, 224, 0.92), rgba(248, 226, 172, 0.85));
+  border: 1.2px solid rgba(184, 130, 40, 0.62);
+  font-family: var(--font-sans);
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.5px;
+  color: #5A0F24;
+  box-shadow: 0 4px 14px rgba(184, 130, 40, 0.16);
+}
+
+html[data-theme="night"] .tod-greeting-badge {
+  background: linear-gradient(135deg, rgba(64, 14, 32, 0.94), rgba(40, 8, 20, 0.94));
+  color: #FCE8A6;
+  border-color: rgba(247, 208, 120, 0.65);
+}
+
+.cd-event-switcher {
+  display: inline-flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 6px;
+  padding: 4px;
+  border-radius: 999px;
+  background: rgba(184, 130, 40, 0.12);
+  border: 1px solid rgba(184, 130, 40, 0.35);
+}
+
+.cd-evt-btn {
+  padding: 5px 12px;
+  border-radius: 999px;
+  font-family: var(--font-sans);
+  font-size: 10.5px;
+  font-weight: 700;
+  color: var(--wine-royal);
+  opacity: 0.78;
+  transition: all 0.25s ease;
+}
+
+.cd-evt-btn.active {
+  background: linear-gradient(135deg, #5A0F24, #8E1A38);
+  color: #FFF7DF;
+  opacity: 1;
+  box-shadow: 0 4px 12px rgba(90, 15, 36, 0.25);
+}
+
+html[data-theme="night"] .cd-evt-btn.active {
+  background: linear-gradient(135deg, #FCE8A6, #D99E32);
+  color: #2B0512;
+}
+
 .countdown-royal-grid {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
   gap: clamp(8px, 1.5vw, 14px);
-  margin: 18px 0;
+  margin: 12px 0 8px;
 }
 
 .cd-tile {
-  background: linear-gradient(145deg, #FFFDF9, #F9E9D6);
-  border: 1.5px solid rgba(184, 130, 40, 0.58);
-  border-radius: 18px;
-  padding: 12px 6px;
+  position: relative;
+  overflow: hidden;
+  background:
+    radial-gradient(circle at 50% 18%, rgba(255, 255, 255, 0.96) 0%, rgba(255, 249, 236, 0.92) 56%, rgba(245, 224, 188, 0.88) 100%);
+  border: 1.8px solid rgba(201, 144, 44, 0.78);
+  border-radius: 22px;
+  padding: 12px 6px 10px;
   text-align: center;
-  box-shadow: 0 8px 20px rgba(90, 15, 36, 0.08);
+  box-shadow:
+    0 12px 26px rgba(90, 15, 36, 0.12),
+    0 2px 8px rgba(184, 130, 40, 0.20),
+    inset 0 0 0 1.5px rgba(255, 255, 255, 0.92);
+  transition: transform 0.28s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.28s ease;
+}
+
+.cd-tile:hover {
+  transform: translateY(-4px) scale(1.03);
+  box-shadow:
+    0 16px 32px rgba(90, 15, 36, 0.18),
+    0 0 18px rgba(229, 186, 99, 0.52),
+    inset 0 0 0 1.5px rgba(255, 255, 255, 0.95);
+}
+
+html[data-theme="night"] .cd-tile {
+  background:
+    radial-gradient(circle at 50% 18%, rgba(68, 14, 34, 0.95) 0%, rgba(38, 7, 20, 0.95) 65%, rgba(24, 4, 12, 0.96) 100%);
+  border-color: rgba(247, 208, 120, 0.72);
+  box-shadow:
+    0 14px 30px rgba(0, 0, 0, 0.48),
+    0 0 18px rgba(229, 186, 99, 0.18),
+    inset 0 0 0 1px rgba(255, 240, 195, 0.25);
+}
+
+.cd-corner {
+  position: absolute;
+  width: 9px;
+  height: 9px;
+  border-color: var(--gold-warm);
+  border-style: solid;
+  opacity: 0.72;
+  pointer-events: none;
+}
+.cd-corner.tl { top: 5px; left: 5px; border-width: 1.8px 0 0 1.8px; border-top-left-radius: 5px; }
+.cd-corner.tr { top: 5px; right: 5px; border-width: 1.8px 1.8px 0 0; border-top-right-radius: 5px; }
+.cd-corner.bl { bottom: 5px; left: 5px; border-width: 0 0 1.8px 1.8px; border-bottom-left-radius: 5px; }
+.cd-corner.br { bottom: 5px; right: 5px; border-width: 0 1.8px 1.8px 0; border-bottom-right-radius: 5px; }
+
+.cd-ring-wrap {
+  position: relative;
+  width: clamp(56px, 7.2vw, 74px);
+  height: clamp(56px, 7.2vw, 74px);
+  margin: 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.cd-ring-svg {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  transform: rotate(-90deg);
+}
+
+.cd-ring-track {
+  fill: none;
+  stroke: rgba(184, 130, 40, 0.20);
+  stroke-width: 4.2;
+}
+
+.cd-ring-prog {
+  fill: none;
+  stroke: url(#goldFoil);
+  stroke-width: 4.8;
+  stroke-linecap: round;
+  transition: stroke-dashoffset 0.45s cubic-bezier(0.22, 1, 0.36, 1);
 }
 
 .cd-tile b {
+  position: relative;
+  z-index: 2;
   display: block;
   font-family: var(--font-royal);
   font-weight: 800;
-  font-size: clamp(24px, 3.4vw, 38px);
-  line-height: 1.05;
+  font-size: clamp(20px, 2.7vw, 30px);
+  line-height: 1;
   color: var(--wine-royal);
   font-variant-numeric: tabular-nums;
+  transition: transform 0.24s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.cd-tile.tick-pulse b {
+  transform: scale(1.14);
 }
 
 .cd-tile small {
   display: block;
-  margin-top: 4px;
+  margin-top: 5px;
   font-family: var(--font-sans);
-  font-weight: 700;
-  font-size: 10px;
+  font-weight: 800;
+  font-size: 9.5px;
   letter-spacing: 1.6px;
   text-transform: uppercase;
   color: var(--gold-deep);
+}
+
+.cd-live-subnote {
+  font-family: var(--font-sans);
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--wine-soft);
+  margin: 4px 0 14px;
+  opacity: 0.92;
 }
 
 /* Lakeside Couple Diorama Stage */
@@ -1604,11 +1885,17 @@ img {
 .itinerary-summary-card {
   position: relative;
   overflow: hidden;
-  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  border-top: 3.5px solid var(--gold-foil);
+  transition: transform 0.32s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.32s ease;
 }
 
 .itinerary-summary-card:hover {
-  transform: translateY(-4px);
+  transform: translateY(-5px) scale(1.01);
+  box-shadow: 0 24px 54px rgba(90, 15, 36, 0.20), 0 0 22px rgba(229, 186, 99, 0.38);
+}
+
+html[data-theme="night"] .itinerary-summary-card h3 {
+  color: #FCE8A6 !important;
 }
 
 .day-pill-tag {

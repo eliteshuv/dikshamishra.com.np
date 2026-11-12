@@ -28,20 +28,36 @@
     if (localStorage.getItem('diksha-wedding-lang') === 'ne') lang = 'ne';
   } catch (_) {}
 
+  // Time-Based Theme Engine: 'day' (06:00-16:59), 'dusk' (17:00-19:14), 'night' (19:15-05:59)
+  function detectTimeOfDayTheme() {
+    const h = new Date().getHours();
+    const m = new Date().getMinutes();
+    const hm = h + m / 60;
+    if (hm >= 6 && hm < 17) return 'day';
+    if (hm >= 17 && hm < 19.25) return 'dusk';
+    return 'night';
+  }
+
+  let currentTheme = detectTimeOfDayTheme();
+  let userOverrodeTheme = false;
+
   let gateOpened = false;
-  const GATE_AUTO_OPEN_MS = 2700; // Auto-opens cleanly at 2.7s (or immediately on tap)
+  const GATE_AUTO_OPEN_MS = 1080; // Ultra-fast 1.08s auto-open with iOS Duo depth-of-field blur reveal!
   const gateBootTime = performance.now();
   let gateStartMs = gateBootTime;
+  let gateOpenedTimestamp = 0;
 
   let musicEnabled = true;          // Smart adaptive music ON by default
-  let awaitingGestureUnlock = false; // True if browser deferred autoplay until first touch/scroll
+  let awaitingGestureUnlock = false; // True if browser deferred autoplay until first touch/click
   let audioCtx = null;
 
   let activeChapterIdx = 0;
   let autoScrollActive = !reducedMotion;
   let chapterDwellElapsed = 0;
   let programmaticScrollUntil = 0;
-  const CHAPTER_DWELL_SEC = [9.5, 9.5, 10.0, 10.0, 9.0, 12.0];
+
+  let countdownTargetMode = 'vivah'; // 'vivah' (25 Nov 5 PM) or 'sangeet' (24 Nov 6 PM)
+  let lastCountdownVals = { 'cd-days': '', 'cd-hours': '', 'cd-mins': '', 'cd-secs': '' };
 
   let saptapadiIndex = 0;
   let saptapadiTimer = 0;
@@ -57,6 +73,62 @@
 
   const nepaliDigits = (str) =>
     lang === 'ne' ? String(str).replace(/\d/g, (d) => '०१२३४५६७८९'[d]) : String(str);
+
+  // ---------- Time-of-Day Theme Application & HUD ----------
+  const themeMetaMap = {
+    day: {
+      icon: '☀️',
+      en: 'Day',
+      ne: 'दिवा',
+      color: '#5A0F24',
+      greetEn: '☀️ Auspicious Daylight · Janakpur Dham',
+      greetNe: '☀️ शुभ दिवा प्रहर · जनकपुरधाम'
+    },
+    dusk: {
+      icon: '🌅',
+      en: 'Dusk',
+      ne: 'गोधूलि',
+      color: '#6E1E14',
+      greetEn: '🌅 Golden Godhuli Dusk · Janakpur Dham',
+      greetNe: '🌅 स्वर्णिम गोधूलि सन्ध्या · जनकपुरधाम'
+    },
+    night: {
+      icon: '🌙',
+      en: 'Night',
+      ne: 'रात्रि',
+      color: '#16040C',
+      greetEn: '🌙 Starry Mithila Night · Janakpur Dham',
+      greetNe: '🌙 तारापुञ्ज मिथिला रात्रि · जनकपुरधाम'
+    }
+  };
+
+  function applyTheme(themeName, announce = false) {
+    currentTheme = themeMetaMap[themeName] ? themeName : 'day';
+    document.documentElement.setAttribute('data-theme', currentTheme);
+    const meta = themeMetaMap[currentTheme];
+    const themeColorEl = $('meta[name="theme-color"]');
+    if (themeColorEl) themeColorEl.setAttribute('content', meta.color);
+
+    const iconEl = $('#theme-pill-icon');
+    const lblEl = $('#theme-pill-label');
+    if (iconEl) iconEl.textContent = meta.icon;
+    if (lblEl) lblEl.textContent = lang === 'ne' ? meta.ne : meta.en;
+
+    const greetEl = $('#tod-greeting-badge');
+    if (greetEl) greetEl.textContent = lang === 'ne' ? meta.greetNe : meta.greetEn;
+
+    if (announce) {
+      showToast(
+        `${meta.icon} Switched to ${meta.en} Ambiance`,
+        `${meta.icon} ${meta.ne} थिम सक्रिय गरियो`
+      );
+    }
+  }
+  applyTheme(currentTheme, false);
+  window.setWeddingTheme = (themeName) => {
+    userOverrodeTheme = true;
+    applyTheme(themeName, false);
+  };
 
   // ---------- Toast & Lens Bloom ----------
   let toastTimer = null;
@@ -438,19 +510,32 @@
     ph: i * 0.9
   }));
 
-  const petalCount = vw < 700 ? 14 : 26;
-  const driftingPetals = Array.from({ length: petalCount }, (_, i) => ({
-    x: Math.random() * vw,
-    y: Math.random() * vh,
-    vy: 28 + (i % 5) * 9,
-    amp: 22 + (i % 4) * 8,
-    freq: 0.65 + (i % 4) * 0.2,
-    rotSpd: 0.8 + (i % 4) * 0.35,
-    w: 8 + (i % 4) * 2.5,
-    h: 5 + (i % 3) * 1.8,
-    col: ['rgba(236, 134, 158, 0.55)', 'rgba(186, 48, 76, 0.45)', 'rgba(244, 184, 68, 0.52)'][i % 3],
-    ph: i * 1.37
-  }));
+  const flowerCount = vw < 700 ? 18 : 30;
+  const flowerPalettes = [
+    { type: 'rose',     petals: 6, outer: 'rgba(232, 102, 136, 0.78)', inner: 'rgba(255, 198, 214, 0.88)', core: '#FFE082' },
+    { type: 'marigold', petals: 8, outer: 'rgba(246, 168, 36, 0.80)',  inner: 'rgba(255, 216, 98, 0.90)',  core: '#D86C08' },
+    { type: 'lotus',    petals: 6, outer: 'rgba(214, 72, 114, 0.72)',  inner: 'rgba(252, 184, 206, 0.86)', core: '#FFF3C4' },
+    { type: 'jasmine',  petals: 5, outer: 'rgba(255, 248, 232, 0.84)', inner: 'rgba(252, 232, 182, 0.90)', core: '#E5BA63' }
+  ];
+
+  const driftingFlowers = Array.from({ length: flowerCount }, (_, i) => {
+    const pal = flowerPalettes[i % flowerPalettes.length];
+    return {
+      x: Math.random() * vw,
+      y: Math.random() * vh,
+      vx: 0,
+      vy: 20 + (i % 5) * 6.5,
+      amp: 20 + (i % 4) * 7,
+      freq: 0.55 + (i % 4) * 0.16,
+      rot: Math.random() * Math.PI * 2,
+      rotSpd: (i % 2 === 0 ? 1 : -1) * (0.55 + (i % 4) * 0.22),
+      spinBoost: 0,
+      radius: 10 + (i % 4) * 3.2,
+      pal,
+      ph: i * 1.37,
+      popCooldown: 0
+    };
+  });
 
   const fgBokeh = Array.from({ length: vw < 700 ? 5 : 9 }, (_, i) => ({
     x: Math.random() * vw,
@@ -492,6 +577,48 @@
     }
   }
 
+  // Interactive Falling Flowers: Swirl on Pointer/Touch Move & Pop/Bloom on Direct Touch or Swipe!
+  let lastChimeMs = 0;
+  function interactWithFallingFlowers(px, py, isTap = false) {
+    if (reducedMotion) return false;
+    let poppedAny = false;
+    const t = performance.now() / 1000;
+    for (const fl of driftingFlowers) {
+      if (fl.popCooldown > 0) continue;
+      const renderX = fl.x + Math.cos(t * fl.freq + fl.ph) * fl.amp;
+      const dx = renderX - px;
+      const dy = fl.y - py;
+      const dist = Math.hypot(dx, dy);
+      const popRadius = isTap ? fl.radius * 3.2 : fl.radius * 1.95;
+
+      if (dist < popRadius) {
+        // Bloom / pop this flower into a mini shower of petals & pollen!
+        spawnPetalBurst(renderX, fl.y, isTap ? 20 : 12, fl.pal.type === 'marigold' ? 'haldi' : 'royal');
+        fl.popCooldown = 0.45;
+        fl.y = -24 - Math.random() * 45;
+        fl.x = Math.random() * vw;
+        fl.vx = 0;
+        fl.spinBoost = 0;
+        poppedAny = true;
+        const nowMs = performance.now();
+        if (nowMs - lastChimeMs > 240) {
+          lastChimeMs = nowMs;
+          playTempleBell(1.25 + (Math.random() * 0.35), 0.065);
+        }
+        if (isTap) break;
+      } else if (dist < 118) {
+        // Gentle wind-vortex swirl & repulsion when cursor/finger glides nearby!
+        const force = (1 - dist / 118) * 3.8;
+        const nx = dx / Math.max(1, dist);
+        const ny = dy / Math.max(1, dist);
+        fl.vx += (nx * force - ny * force * 0.45) * 14;
+        fl.y += ny * force * 1.6;
+        fl.spinBoost = Math.min(8, fl.spinBoost + force * 1.6);
+      }
+    }
+    return poppedAny;
+  }
+
   let lastTrailTs = 0;
   window.addEventListener(
     'pointermove',
@@ -502,6 +629,8 @@
           const pct = ((e.clientX / Math.max(1, vw)) * 120 - 60).toFixed(1);
           gate.style.setProperty('--sheen-x', `${pct}%`);
         }
+      } else {
+        interactWithFallingFlowers(e.clientX, e.clientY, false);
       }
       const now = performance.now();
       if (now - lastTrailTs > 60 && !reducedMotion) {
@@ -520,6 +649,17 @@
           decay: 0.03
         });
       }
+    },
+    { passive: true }
+  );
+
+  window.addEventListener(
+    'pointerdown',
+    (e) => {
+      if (!gateOpened) return;
+      // Ignore taps directly on interactive buttons/inputs/links so we never interfere
+      if (e.target.closest('button, a, input, select, textarea, label')) return;
+      interactWithFallingFlowers(e.clientX, e.clientY, true);
     },
     { passive: true }
   );
@@ -605,14 +745,19 @@
     }
   }
 
-  function updateCarStatusBadge(boardingPhase) {
+  function updateCarStatusBadge(stageIdx) {
     const badge = $('#car-3d-status-badge');
     if (!badge) return;
-    if (boardingPhase) {
+    if (stageIdx === 0) {
       badge.textContent =
         lang === 'ne'
-          ? '✨ वर-वधु शाही कारमा सवार हुँदै…'
-          : '✨ Bride & Groom Taking Their Seats…';
+          ? '✨ शाही तोरणमा वर-वधु सवार · पुष्पवर्षा…'
+          : '✨ Royal Archway Blessing · Bride & Groom Seated…';
+    } else if (stageIdx === 1) {
+      badge.textContent =
+        lang === 'ne'
+          ? '✨ शुभ प्रस्थान · दीप र पुष्पमालाका साथ…'
+          : '✨ Ready for Departure · Headlights & Floral Garland…';
     } else {
       badge.textContent =
         lang === 'ne'
@@ -621,7 +766,7 @@
     }
   }
 
-  // Render 60fps 3D Perspective Royal Palace Boulevard & Moving Couple Convertible
+  // Render 60fps 3D Perspective Royal Palace Boulevard & Graceful Multi-Stage Couple Convertible
   function render3DGetawayScene(dt, t) {
     if (!car3DCtx || !car3DCv) return;
     const W = car3DCv.width;
@@ -631,41 +776,82 @@
     carSceneTime += dt;
     carTurboBoost = Math.max(0, carTurboBoost - dt * 0.85);
 
-    // Phase A (0 -> 2.0s): Couple Boarding & Seating; Phase B (2.0s+): 3D Boulevard Drive!
-    const boardingDur = 2.0;
-    const isBoarding = carSceneTime < boardingDur;
-    const driveRamp = clamp((carSceneTime - boardingDur) / 1.1, 0, 1);
-    const speed = isBoarding ? 0 : (driveRamp * (1.0 + carTurboBoost * 1.45));
-    carScrollDist += speed * dt * 1.15;
+    // Graceful 3-Stage Choreography (No jarring fast shrinking sprites!):
+    // Stage 0 (0.0s -> 1.85s): Camera dollies in under Palace Archway while couple gently settles into plush seats + petal shower
+    // Stage 1 (1.85s -> 2.85s): Warm 3D headlights fade on, silk marigold ribbons stream out, horn chimes gently
+    // Stage 2 (2.85s+): Smooth cosine-eased acceleration down the 3D palace boulevard!
+    const stageIdx = carSceneTime < 1.85 ? 0 : carSceneTime < 2.85 ? 1 : 2;
+    const rawDriveProgress = clamp((carSceneTime - 2.65) / 2.5, 0, 1);
+    const driveRamp = 0.5 - 0.5 * Math.cos(Math.PI * rawDriveProgress); // Silky cosine S-curve acceleration!
+    const speed = driveRamp * (0.92 + carTurboBoost * 1.35);
+    carScrollDist += speed * dt * 0.92;
 
-    updateCarStatusBadge(isBoarding);
+    updateCarStatusBadge(stageIdx);
 
-    // 1. Golden Sunset Mithila Sky & Horizon Vanishing Point (aligned with 3D car heading!)
+    // Smooth camera dolly-in during Stage 0 (1.07x -> 1.00x over 2.4s)
+    const camIntroP = clamp(carSceneTime / 2.4, 0, 1);
+    const camZoom = lerp(1.065, 1.0, 0.5 - 0.5 * Math.cos(Math.PI * camIntroP));
+
+    ctx.save();
+    ctx.translate(W * 0.5, H * 0.5);
+    ctx.scale(camZoom, camZoom);
+    ctx.translate(-W * 0.5, -H * 0.5);
+
+    // 1. Theme-Aware Mithila Sky & Horizon Vanishing Point (aligned with 3D car heading!)
     const vx = W * 0.80;
     const vy = H * 0.24;
+    const domTheme = document.documentElement.getAttribute('data-theme') || currentTheme;
+    const isNight = domTheme === 'night';
 
     const skyGrad = ctx.createLinearGradient(0, 0, 0, H);
-    skyGrad.addColorStop(0, '#FFE4BC');
-    skyGrad.addColorStop(0.35, '#FAD0A8');
-    skyGrad.addColorStop(0.65, '#E9BA94');
-    skyGrad.addColorStop(1, '#CFA07A');
+    if (isNight) {
+      skyGrad.addColorStop(0, '#140410');
+      skyGrad.addColorStop(0.38, '#2A0A1E');
+      skyGrad.addColorStop(0.72, '#4A1828');
+      skyGrad.addColorStop(1, '#682832');
+    } else {
+      skyGrad.addColorStop(0, '#FFE4BC');
+      skyGrad.addColorStop(0.35, '#FAD0A8');
+      skyGrad.addColorStop(0.65, '#E9BA94');
+      skyGrad.addColorStop(1, '#CFA07A');
+    }
     ctx.fillStyle = skyGrad;
     ctx.fillRect(0, 0, W, H);
 
-    // Glowing Sunset Orb & Volumetric Rays at 3D Vanishing Point
+    // Twinkling stars in Night theme
+    if (isNight) {
+      for (let s = 0; s < 24; s++) {
+        const sx = ((s * 97) % (W - 20)) + 10;
+        const sy = ((s * 43) % Math.floor(vy + 15));
+        const tw = 0.35 + 0.65 * Math.abs(Math.sin(t * 2.2 + s));
+        ctx.fillStyle = `rgba(255, 244, 204, ${tw.toFixed(3)})`;
+        ctx.beginPath();
+        ctx.arc(sx, sy, s % 3 === 0 ? 1.7 : 1.1, 0, Math.PI * 2);
+        ctx.fill();
+      }
+    }
+
+    // Glowing Sunset / Full Moon Orb & Volumetric Rays at 3D Vanishing Point
     const sunGlow = ctx.createRadialGradient(vx, vy, 8, vx, vy, W * 0.45);
-    sunGlow.addColorStop(0, 'rgba(255, 252, 232, 0.98)');
-    sunGlow.addColorStop(0.28, 'rgba(255, 214, 132, 0.65)');
-    sunGlow.addColorStop(0.68, 'rgba(244, 162, 118, 0.22)');
-    sunGlow.addColorStop(1, 'rgba(244, 162, 118, 0)');
+    if (isNight) {
+      sunGlow.addColorStop(0, 'rgba(255, 248, 220, 0.92)');
+      sunGlow.addColorStop(0.24, 'rgba(245, 202, 118, 0.42)');
+      sunGlow.addColorStop(0.65, 'rgba(168, 68, 92, 0.18)');
+      sunGlow.addColorStop(1, 'rgba(168, 68, 92, 0)');
+    } else {
+      sunGlow.addColorStop(0, 'rgba(255, 252, 232, 0.98)');
+      sunGlow.addColorStop(0.28, 'rgba(255, 214, 132, 0.65)');
+      sunGlow.addColorStop(0.68, 'rgba(244, 162, 118, 0.22)');
+      sunGlow.addColorStop(1, 'rgba(244, 162, 118, 0)');
+    }
     ctx.fillStyle = sunGlow;
     ctx.fillRect(0, 0, W, H);
 
     ctx.save();
     ctx.translate(vx, vy);
     for (let r = 0; r < 12; r++) {
-      const ang = (r / 12) * Math.PI * 2 + t * 0.08;
-      ctx.fillStyle = 'rgba(255, 245, 205, 0.14)';
+      const ang = (r / 12) * Math.PI * 2 + t * 0.06;
+      ctx.fillStyle = isNight ? 'rgba(255, 235, 180, 0.07)' : 'rgba(255, 245, 205, 0.14)';
       ctx.beginPath();
       ctx.moveTo(0, 0);
       ctx.lineTo(Math.cos(ang - 0.06) * W, Math.sin(ang - 0.06) * W);
@@ -676,7 +862,7 @@
     ctx.restore();
 
     // Distant Janakpur Palace Silhouette on Horizon
-    ctx.fillStyle = 'rgba(138, 62, 58, 0.18)';
+    ctx.fillStyle = isNight ? 'rgba(24, 6, 14, 0.55)' : 'rgba(138, 62, 58, 0.18)';
     ctx.beginPath();
     ctx.moveTo(0, vy + 24);
     for (let px = 0; px <= W; px += 38) {
@@ -695,9 +881,15 @@
     const roadRightNearY = H * 1.14;
 
     const roadGrad = ctx.createLinearGradient(vx, vy, W * 0.25, H);
-    roadGrad.addColorStop(0, '#E8C5A0');
-    roadGrad.addColorStop(0.45, '#C89B78');
-    roadGrad.addColorStop(1, '#9E6E52');
+    if (isNight) {
+      roadGrad.addColorStop(0, '#5E383C');
+      roadGrad.addColorStop(0.45, '#422228');
+      roadGrad.addColorStop(1, '#2C141A');
+    } else {
+      roadGrad.addColorStop(0, '#E8C5A0');
+      roadGrad.addColorStop(0.45, '#C89B78');
+      roadGrad.addColorStop(1, '#9E6E52');
+    }
     ctx.fillStyle = roadGrad;
     ctx.beginPath();
     ctx.moveTo(vx - 16, vy);
@@ -720,9 +912,8 @@
     // 3. Perspective-Projected Moving Center Dashes, Sandstone Palace Arches & Glowing Roadside Diyas
     const numSlices = 14;
     for (let i = 0; i < numSlices; i++) {
-      // u goes 0 (horizon) -> 1 (foreground camera), advancing smoothly with carScrollDist!
       const lin = ((i / numSlices) + (carScrollDist % 1) / numSlices + (carScrollDist * 0.35)) % 1;
-      const p = Math.pow(lin, 2.15); // 3D perspective foreshortening!
+      const p = Math.pow(lin, 2.15);
       const pNext = Math.pow(Math.min(1, lin + 0.038), 2.15);
 
       const lx = lerp(vx - 15, roadLeftNearX, p);
@@ -736,7 +927,7 @@
       const cy2 = (lerp(vy, roadLeftNearY, pNext) + lerp(vy + 4, roadRightNearY, pNext)) * 0.5;
 
       // Center gold boulevard dash
-      ctx.strokeStyle = `rgba(255, 240, 190, ${(0.2 + p * 0.72).toFixed(3)})`;
+      ctx.strokeStyle = `rgba(255, 240, 190, ${(0.22 + p * 0.72).toFixed(3)})`;
       ctx.lineWidth = Math.max(1, p * 5.5);
       ctx.beginPath();
       ctx.moveTo(cx1, cy1);
@@ -746,46 +937,46 @@
       // Roadside Sandstone Pillars & Glowing Diyas on Left & Right Shoulders
       const pillarH = 18 + p * 165;
       const pillarW = 3 + p * 18;
-      const alpha = clamp(p * 1.4, 0.12, 0.92);
+      const alpha = clamp(p * 1.4, 0.14, 0.94);
 
-      // Left colonnade pillar + marigold lamp
-      ctx.fillStyle = `rgba(176, 108, 76, ${(alpha * 0.65).toFixed(3)})`;
+      ctx.fillStyle = isNight
+        ? `rgba(116, 62, 54, ${(alpha * 0.72).toFixed(3)})`
+        : `rgba(176, 108, 76, ${(alpha * 0.65).toFixed(3)})`;
       ctx.fillRect(lx - pillarW * 1.4, ly - pillarH, pillarW, pillarH);
-      ctx.fillStyle = `rgba(255, 192, 64, ${alpha.toFixed(3)})`;
+      ctx.fillStyle = `rgba(255, 198, 72, ${alpha.toFixed(3)})`;
       ctx.beginPath();
-      ctx.arc(lx - pillarW * 0.9, ly - 3 * p, 1.5 + p * 5.5, 0, Math.PI * 2);
+      ctx.arc(lx - pillarW * 0.9, ly - 3 * p, 1.8 + p * 5.8, 0, Math.PI * 2);
       ctx.fill();
 
-      // Right colonnade diya
-      ctx.fillStyle = `rgba(255, 192, 64, ${(alpha * 0.9).toFixed(3)})`;
+      ctx.fillStyle = `rgba(255, 198, 72, ${(alpha * 0.92).toFixed(3)})`;
       ctx.beginPath();
-      ctx.arc(rx + 6 * p, ry - 3 * p, 1.5 + p * 5.5, 0, Math.PI * 2);
+      ctx.arc(rx + 6 * p, ry - 3 * p, 1.8 + p * 5.8, 0, Math.PI * 2);
       ctx.fill();
     }
 
-    // 4. Car Position, 3D Perspective Scale, Suspension Bounce & Road Banking
-    // Subtle 3D forward-right cruise motion + S-curve sway
-    const laneSwayX = speed > 0 ? Math.sin(t * 1.45) * 10 : 0;
-    const laneSwayY = speed > 0 ? Math.cos(t * 1.45) * 4 : 0;
-    const seatDip =
-      carSceneTime > 1.05 && carSceneTime < 1.85
-        ? Math.sin(((carSceneTime - 1.05) / 0.8) * Math.PI) * 9.5
-        : 0;
-    const engineBounce = speed > 0 ? Math.sin(t * (15 + carTurboBoost * 10)) * (1.8 + carTurboBoost * 1.6) : 0;
+    // 4. Graceful Car Positioning, Plush Seating Settle & Silky S-Curve Cruise
+    // During Stage 0 (0.0s -> 1.8s), the convertible's plush leather suspension gently dips & settles
+    // as the Bride & Groom settle into their seats under a shower of blessing petals.
+    const settleEnv = carSceneTime < 2.2 ? Math.exp(-carSceneTime * 1.8) * Math.sin(carSceneTime * 4.2) : 0;
+    const seatDip = settleEnv * 7.5;
+    const laneSwayX = Math.sin(t * 1.15) * (8.5 * driveRamp);
+    const laneSwayY = Math.cos(t * 1.15) * (3.2 * driveRamp);
+    const engineHum = Math.sin(t * (11 + carTurboBoost * 8)) * (0.9 * driveRamp + carTurboBoost * 1.2);
 
     const carW = W * 0.64;
     const carH = carW * (633 / 960);
-    const carX = W * 0.15 + laneSwayX + driveRamp * 12;
-    const carY = H * 0.20 + laneSwayY + seatDip + engineBounce - driveRamp * 4;
+    // Smoothly glides forward along the boulevard vector as driveRamp goes 0 -> 1
+    const carX = W * 0.13 + driveRamp * (W * 0.045) + laneSwayX;
+    const carY = H * 0.21 - driveRamp * (H * 0.02) + laneSwayY + seatDip + engineHum;
 
-    // 5. Warm Volumetric 3D Headlight Cone (switches ON as couple finishes boarding at t=1.25s!)
-    const lightOn = clamp((carSceneTime - 1.2) / 0.5, 0, 1);
+    // 5. Warm Volumetric 3D Headlight Cone (fades in smoothly during Stage 1: 1.6s -> 2.6s)
+    const lightOn = clamp((carSceneTime - 1.55) / 1.05, 0, 1);
     if (lightOn > 0.02) {
       const hlX = carX + carW * 0.90;
       const hlY = carY + carH * 0.30;
-      const beamGrad = ctx.createRadialGradient(hlX, hlY, 4, hlX + 95, hlY - 36, 185);
-      beamGrad.addColorStop(0, `rgba(255, 248, 198, ${(0.72 * lightOn).toFixed(3)})`);
-      beamGrad.addColorStop(0.5, `rgba(255, 224, 130, ${(0.28 * lightOn).toFixed(3)})`);
+      const beamGrad = ctx.createRadialGradient(hlX, hlY, 4, hlX + 95, hlY - 36, 195);
+      beamGrad.addColorStop(0, `rgba(255, 248, 198, ${(0.76 * lightOn).toFixed(3)})`);
+      beamGrad.addColorStop(0.5, `rgba(255, 224, 130, ${(0.32 * lightOn).toFixed(3)})`);
       beamGrad.addColorStop(1, 'rgba(255, 224, 130, 0)');
       ctx.fillStyle = beamGrad;
       ctx.beginPath();
@@ -801,9 +992,9 @@
     ctx.translate(carX + carW * 0.52, carY + carH * 0.80);
     ctx.rotate(-0.34);
     const shGrad = ctx.createRadialGradient(0, 0, 18, 0, 0, carW * 0.52);
-    shGrad.addColorStop(0, 'rgba(54, 18, 22, 0.44)');
-    shGrad.addColorStop(0.65, 'rgba(54, 18, 22, 0.18)');
-    shGrad.addColorStop(1, 'rgba(54, 18, 22, 0)');
+    shGrad.addColorStop(0, 'rgba(42, 10, 16, 0.48)');
+    shGrad.addColorStop(0.65, 'rgba(42, 10, 16, 0.20)');
+    shGrad.addColorStop(1, 'rgba(42, 10, 16, 0)');
     ctx.fillStyle = shGrad;
     ctx.scale(1, 0.32);
     ctx.beginPath();
@@ -811,61 +1002,52 @@
     ctx.fill();
     ctx.restore();
 
-    // 7. Boarding Phase (0 -> 1.45s): Standing Bride & Groom Glide Up & Step Into Cabin!
-    if (carSceneTime < 1.55 && standingCoupleImg.complete && standingCoupleImg.naturalWidth > 0) {
-      const bp = clamp(carSceneTime / 1.35, 0, 1);
-      const easeBp = 1 - Math.pow(1 - bp, 3);
-      const stAlpha = clamp(1 - (carSceneTime - 0.95) / 0.5, 0, 1);
-      const figH = H * lerp(0.56, 0.40, easeBp);
-      const figW = figH * (standingCoupleImg.naturalWidth / standingCoupleImg.naturalHeight);
-      const figX = lerp(W * 0.05, carX + carW * 0.34, easeBp);
-      const figY = lerp(H * 0.26, carY + carH * 0.04, easeBp);
-
+    // 7. Flowing Silk Marigold & Rose Ribbons Streaming Behind the Convertible Trunk!
+    const ribbonVis = clamp((carSceneTime - 1.1) / 1.0, 0, 1);
+    if (ribbonVis > 0.02) {
       ctx.save();
-      ctx.globalAlpha = stAlpha;
-      ctx.drawImage(standingCoupleImg, figX, figY, figW, figH);
+      ctx.globalAlpha = ribbonVis * 0.86;
+      const rColors = ['#FFB703', '#E84A8A', '#FFF3C4'];
+      rColors.forEach((rc, rIdx) => {
+        ctx.strokeStyle = rc;
+        ctx.lineWidth = 2.6 - rIdx * 0.4;
+        ctx.beginPath();
+        const rx0 = carX + carW * 0.14;
+        const ry0 = carY + carH * (0.50 + rIdx * 0.045);
+        ctx.moveTo(rx0, ry0);
+        const len = 36 + driveRamp * 48 + carTurboBoost * 28;
+        const w1 = Math.sin(t * 7.5 + rIdx * 1.4) * (6 + driveRamp * 6);
+        const w2 = Math.cos(t * 7.5 + rIdx * 1.4) * (9 + driveRamp * 8);
+        ctx.bezierCurveTo(rx0 - len * 0.4, ry0 + 10 + w1, rx0 - len * 0.75, ry0 + 22 + w2, rx0 - len, ry0 + 30 + w1);
+        ctx.stroke();
+      });
       ctx.restore();
-
-      if (Math.random() < 0.65) {
-        spawnCarWakePetal(figX + figW * 0.6, figY + figH * 0.4, 1);
-      }
     }
 
     // 8. Draw the 3D Royal Convertible with Seated Bride & Groom!
     if (car3DCoupleImg.complete && car3DCoupleImg.naturalWidth > 0) {
       ctx.save();
-      const bankRot = speed > 0 ? Math.cos(t * 1.45) * 0.014 : 0;
+      const bankRot = Math.cos(t * 1.15) * (0.011 * driveRamp) + settleEnv * 0.012;
       ctx.translate(carX + carW * 0.5, carY + carH * 0.5);
       ctx.rotate(bankRot);
 
-      if (carSceneTime < 1.25) {
-        // Before 1.25s, softly veil the upper cabin while the boarding couple glides into their seats,
-        // then reveal them seated inside with a golden sparkle burst!
-        const seatReveal = clamp((carSceneTime - 0.85) / 0.45, 0, 1);
-        // Draw lower chassis at 100% opacity
-        ctx.save();
+      // Warm golden blessing aura around the couple's cabin during Stage 0 & 1
+      if (carSceneTime < 3.4) {
+        const auraAlpha = Math.sin(clamp(carSceneTime / 3.4, 0, 1) * Math.PI) * 0.42;
+        const cabinGlow = ctx.createRadialGradient(-carW * 0.04, -carH * 0.18, 8, -carW * 0.04, -carH * 0.18, carW * 0.34);
+        cabinGlow.addColorStop(0, `rgba(255, 244, 196, ${auraAlpha.toFixed(3)})`);
+        cabinGlow.addColorStop(1, 'rgba(255, 215, 110, 0)');
+        ctx.fillStyle = cabinGlow;
         ctx.beginPath();
-        ctx.rect(-carW * 0.5, -carH * 0.5 + carH * 0.34, carW, carH * 0.66);
-        ctx.clip();
-        ctx.drawImage(car3DCoupleImg, -carW * 0.5, -carH * 0.5, carW, carH);
-        ctx.restore();
-
-        // Cross-reveal upper cabin with Bride & Groom settling down (+10px -> 0px)
-        ctx.save();
-        ctx.globalAlpha = 0.25 + 0.75 * seatReveal;
-        ctx.beginPath();
-        ctx.rect(-carW * 0.5, -carH * 0.5 - 20, carW, carH * 0.35 + 20);
-        ctx.clip();
-        const settleOffsetY = (1 - seatReveal) * -12;
-        ctx.drawImage(car3DCoupleImg, -carW * 0.5, -carH * 0.5 + settleOffsetY, carW, carH);
-        ctx.restore();
-      } else {
-        ctx.drawImage(car3DCoupleImg, -carW * 0.5, -carH * 0.5, carW, carH);
+        ctx.arc(-carW * 0.04, -carH * 0.18, carW * 0.34, 0, Math.PI * 2);
+        ctx.fill();
       }
 
+      ctx.drawImage(car3DCoupleImg, -carW * 0.5, -carH * 0.5, carW, carH);
+
       // Spinning 3D Golden Wheel Spoke Shimmer Over Rear-Right & Front-Right Wheels!
-      if (speed > 0.05) {
-        const wheelSpin = t * (12 + carTurboBoost * 14);
+      if (speed > 0.02) {
+        const wheelSpin = carScrollDist * 14.0;
         const wheels = [
           { wx: carW * 0.085, wy: carH * 0.285, rx: carW * 0.042, ry: carH * 0.11 },
           { wx: carW * 0.425, wy: carH * 0.015, rx: carW * 0.032, ry: carH * 0.088 }
@@ -888,7 +1070,7 @@
       }
 
       // Ruby Taillight Glow Pulses
-      const tailAlpha = isBoarding ? 0.65 : 0.38 + 0.2 * Math.sin(t * 5);
+      const tailAlpha = stageIdx < 2 ? 0.68 : 0.42 + 0.2 * Math.sin(t * 4.5);
       [
         [-carW * 0.435, carH * 0.14],
         [-carW * 0.045, carH * 0.27]
@@ -905,16 +1087,21 @@
       ctx.restore();
     }
 
-    // 9. Trailing 3D Rose Petals, Marigolds & Golden Hearts Behind the Moving Car!
-    if (speed > 0.1 && Math.random() < 0.45 + carTurboBoost * 0.45) {
+    // 9. Overhead Palace Departure Toran / Marigold Archway Showering Petals During Stage 0 & 1!
+    if (carSceneTime < 2.6 && Math.random() < 0.55) {
+      spawnCarWakePetal(carX + carW * (0.28 + Math.random() * 0.36), carY + carH * 0.12, 1);
+    }
+
+    // Trailing 3D Rose Petals, Marigolds & Golden Hearts Behind the Moving Car!
+    if (speed > 0.08 && Math.random() < 0.42 + carTurboBoost * 0.45) {
       spawnCarWakePetal(carX + carW * 0.18, carY + carH * 0.58, 1);
     }
 
     for (let i = carWakePetals.length - 1; i >= 0; i--) {
       const p = carWakePetals[i];
-      p.x += p.vx * (1 + carTurboBoost * 0.8);
+      p.x += p.vx * (0.65 + speed * 0.55);
       p.y += p.vy;
-      p.rot += 0.08;
+      p.rot += 0.06;
       p.life -= p.decay;
       if (p.life <= 0) {
         carWakePetals.splice(i, 1);
@@ -940,21 +1127,23 @@
       ctx.restore();
     }
 
-    // 10. Turbo Speed Lines when Boosted!
+    // 10. Gentle Speed Shimmer Lines when Boosted!
     if (carTurboBoost > 0.05) {
       ctx.save();
-      ctx.strokeStyle = `rgba(255, 248, 215, ${(carTurboBoost * 0.45).toFixed(3)})`;
+      ctx.strokeStyle = `rgba(255, 248, 215, ${(carTurboBoost * 0.42).toFixed(3)})`;
       ctx.lineWidth = 2;
-      for (let k = 0; k < 7; k++) {
-        const sy = H * (0.18 + k * 0.11);
-        const sx = ((W - ((t * 900 + k * 170) % W)) + W) % W;
+      for (let k = 0; k < 6; k++) {
+        const sy = H * (0.18 + k * 0.12);
+        const sx = ((W - ((t * 720 + k * 170) % W)) + W) % W;
         ctx.beginPath();
         ctx.moveTo(sx, sy);
-        ctx.lineTo(sx - 55 * carTurboBoost, sy + 20 * carTurboBoost);
+        ctx.lineTo(sx - 48 * carTurboBoost, sy + 18 * carTurboBoost);
         ctx.stroke();
       }
       ctx.restore();
     }
+
+    ctx.restore();
   }
 
   // ==========================================================================
@@ -967,8 +1156,23 @@
 
   function setActiveChapter(idx) {
     if (idx === activeChapterIdx || idx < 0 || idx >= chapters.length) return;
+    const prevIdx = activeChapterIdx;
     activeChapterIdx = idx;
     chapterDwellElapsed = 0;
+
+    // Seamless Musical Continuity between Chapter 1 (Ganesh + Bansuri Flute) & Chapter 2 (Bansuri Flute):
+    // Since seg1_ganesh.mp3 (0..92s) and seg2_couple.mp3 (13.8..92s) share the exact studio recording after 13.8s,
+    // sync currentTime so the flute melody flows without restarting!
+    try {
+      const ch1Audio = chapterTracks[0]?.el;
+      const ch2Audio = chapterTracks[1]?.el;
+      if (prevIdx === 0 && idx === 1 && ch1Audio && ch2Audio && ch1Audio.currentTime > 14.2) {
+        const targetTime = ch1Audio.currentTime - 13.8;
+        if (targetTime > 0 && targetTime < (ch2Audio.duration || 78) - 2) {
+          ch2Audio.currentTime = targetTime;
+        }
+      }
+    } catch (_) {}
 
     dockButtons.forEach((btn, bIdx) => {
       btn.classList.toggle('active', bIdx === idx);
@@ -990,10 +1194,10 @@
       } else if (id === 'ch6-finale') {
         if (!ch6EnteredOnce) {
           ch6EnteredOnce = true;
-          carSceneTime = 0; // Play Couple Boarding -> 3D Drive!
+          carSceneTime = 0; // Play graceful 3-Stage Royal Convertible Departure!
           setTimeout(() => {
             if (visibleChapters.has('ch6-finale')) playVintageHorn();
-          }, 1850);
+          }, 2200);
           // Auto-light all 5 Aarti Diyas gracefully
           $$('.aarti-diya-btn').forEach((b, dIdx) => {
             setTimeout(() => {
@@ -1118,14 +1322,33 @@
     setAutoScroll(!autoScrollActive, true);
   });
 
+  const allCoutureCards = $$('.couture-card');
+
   function stepAutoScroll(dt) {
     if (!(gateOpened && autoScrollActive)) return;
+    // Give the guest 2.6 seconds after the gatefold opens to admire Chapter 1 before moving
+    if (gateOpenedTimestamp > 0 && performance.now() - gateOpenedTimestamp < 2600) return;
+
     const maxY = document.documentElement.scrollHeight - window.innerHeight;
-    // If something else moved the page (smooth anchor, etc.) re-sync
     if (Math.abs(window.scrollY - autoLastSet) > 3) autoY = window.scrollY;
-    // ~ one full screen every 11s on every device; slower on the long RSVP finale
-    const base = window.innerHeight / 11;
-    const speed = activeChapterIdx >= 5 ? base * 0.7 : base;
+
+    // Far slower, comfortable reading pace: ~28s base per viewport + gentle reading dwell (0.44x)
+    // whenever a chapter card is in the reading sweet-spot of the screen (~35-38s per chapter!)
+    const base = window.innerHeight / 28;
+    const midY = window.innerHeight * 0.50;
+    let dwellFactor = 1.0;
+    for (let i = 0; i < allCoutureCards.length; i++) {
+      const r = allCoutureCards[i].getBoundingClientRect();
+      const cardMid = (r.top + r.bottom) * 0.5;
+      const dist = Math.abs(cardMid - midY);
+      if (dist < window.innerHeight * 0.24) {
+        const closeness = 1 - dist / (window.innerHeight * 0.24);
+        dwellFactor = Math.min(dwellFactor, 1.0 - 0.56 * closeness);
+      }
+    }
+    const chapterFactor = activeChapterIdx >= 5 ? 0.65 : 1.0;
+    const speed = base * dwellFactor * chapterFactor;
+
     autoY = Math.min(maxY, autoY + speed * dt);
     autoLastSet = autoY;
     window.scrollTo({ top: autoY, behavior: 'instant' });
@@ -1141,7 +1364,6 @@
   // MASTER 60FPS ANIMATION, AUTO-GATEFOLD, AUDIO & AUTO-SCROLL LOOP
   // ==========================================================================
   const gateRingEl = $('#gate-auto-ring');
-  const autoCircleEl = $('#auto-progress-circle');
 
   let prevTime = performance.now();
   function renderLoop(now) {
@@ -1149,7 +1371,7 @@
     prevTime = now;
     const t = now / 1000;
 
-    // A) Smart 2.7s Gatefold Auto-Open Countdown Ring
+    // A) Ultra-Fast 1.08s iOS Duo-Blur Gatefold Auto-Open Countdown Ring
     if (!gateOpened) {
       const elapsedGate = now - gateStartMs;
       const gateProg = clamp(elapsedGate / GATE_AUTO_OPEN_MS, 0, 1);
@@ -1164,7 +1386,7 @@
     // B) Step 6-Deck Chapter Audio Crossfader
     stepAudioCrossfader(dt);
 
-    // C) Smart continuous auto-scroll cruise
+    // C) Smart continuous reading-paced auto-scroll cruise
     stepAutoScroll(dt);
 
     // D) Autonomous Chapter 4 Saptapadi Wish Cycling (every 3.8s while viewing Chapter 4)
@@ -1221,7 +1443,6 @@
     if (visibleChapters.has('ch3-carnival')) {
       if (gulalCtx && gulalCanvas) {
         gulalCtx.clearRect(0, 0, gulalCanvas.width, gulalCanvas.height);
-        // Periodic gentle autonomous Gulal puff so Chapter 3 stays colourful!
         if (gulalPuffs.length < 4 && Math.random() < 0.03) {
           fireGulalCannon(Math.floor(Math.random() * 4));
         }
@@ -1300,7 +1521,7 @@
       render3DGetawayScene(dt, t);
     }
 
-    // 5. Global Ambient Dust Motes, Drifting Petals & Interactive Burst Particles
+    // 5. Global Ambient Dust Motes, Interactive Multi-Petal Falling Flowers & Burst Particles
     if (ambCtx && !reducedMotion) {
       ambCtx.clearRect(0, 0, vw, vh);
 
@@ -1311,28 +1532,68 @@
           m.x = Math.random() * vw;
         }
         const mx = m.x + Math.sin(t * m.freq + m.ph) * m.amp;
-        const alpha = 0.2 + 0.35 * (0.5 + 0.5 * Math.sin(t * 2.6 + m.ph));
-        ambCtx.fillStyle = `rgba(232, 182, 78, ${alpha.toFixed(3)})`;
+        const alpha = 0.22 + 0.38 * (0.5 + 0.5 * Math.sin(t * 2.6 + m.ph));
+        ambCtx.fillStyle = `rgba(238, 192, 88, ${alpha.toFixed(3)})`;
         ambCtx.beginPath();
         ambCtx.arc(mx, m.y, m.r, 0, Math.PI * 2);
         ambCtx.fill();
       }
 
-      for (const p of driftingPetals) {
-        p.y += p.vy * dt;
-        if (p.y > vh + 20) {
-          p.y = -20;
-          p.x = Math.random() * vw;
+      // Draw Interactive Multi-Petal Falling Blossoms (Rose, Marigold, Lotus, Jasmine)
+      for (const fl of driftingFlowers) {
+        if (fl.popCooldown > 0) fl.popCooldown = Math.max(0, fl.popCooldown - dt);
+        fl.y += fl.vy * dt;
+        fl.x += fl.vx * dt;
+        fl.vx *= Math.pow(0.22, dt);
+        fl.spinBoost *= Math.pow(0.18, dt);
+        fl.rot += (fl.rotSpd + fl.spinBoost) * dt;
+
+        if (fl.y > vh + 28) {
+          fl.y = -24;
+          fl.x = Math.random() * vw;
+          fl.vx = 0;
         }
-        const px = p.x + Math.cos(t * p.freq + p.ph) * p.amp;
+        if (fl.x < -30) fl.x = vw + 24;
+        if (fl.x > vw + 30) fl.x = -24;
+
+        const fx = fl.x + Math.cos(t * fl.freq + fl.ph) * fl.amp;
+        const tiltScale = 0.72 + 0.28 * Math.abs(Math.sin(t * 1.6 + fl.ph));
+        const r = fl.radius;
+        const nPetals = fl.pal.petals;
+
         ambCtx.save();
-        ambCtx.translate(px, p.y);
-        ambCtx.rotate(t * p.rotSpd + p.ph);
-        ambCtx.scale(1, 0.62 + 0.38 * Math.abs(Math.sin(t * 2.0 + p.ph)));
-        ambCtx.fillStyle = p.col;
+        ambCtx.translate(fx, fl.y);
+        ambCtx.rotate(fl.rot);
+        ambCtx.scale(1, tiltScale);
+
+        // Outer botanical petals
+        ambCtx.fillStyle = fl.pal.outer;
+        for (let k = 0; k < nPetals; k++) {
+          ambCtx.save();
+          ambCtx.rotate((k * Math.PI * 2) / nPetals);
+          ambCtx.beginPath();
+          ambCtx.ellipse(r * 0.56, 0, r * 0.56, r * 0.34, 0, 0, Math.PI * 2);
+          ambCtx.fill();
+          ambCtx.restore();
+        }
+
+        // Inner layered petals
+        ambCtx.fillStyle = fl.pal.inner;
+        for (let k = 0; k < nPetals; k++) {
+          ambCtx.save();
+          ambCtx.rotate(((k + 0.5) * Math.PI * 2) / nPetals);
+          ambCtx.beginPath();
+          ambCtx.ellipse(r * 0.34, 0, r * 0.36, r * 0.22, 0, 0, Math.PI * 2);
+          ambCtx.fill();
+          ambCtx.restore();
+        }
+
+        // Golden pollen core
+        ambCtx.fillStyle = fl.pal.core;
         ambCtx.beginPath();
-        ambCtx.ellipse(0, 0, p.w, p.h, 0, 0, Math.PI * 2);
+        ambCtx.arc(0, 0, r * 0.22, 0, Math.PI * 2);
         ambCtx.fill();
+
         ambCtx.restore();
       }
 
@@ -1401,6 +1662,7 @@
   function openRoyalGatefold(fromAutoTimer = false) {
     if (gateOpened) return;
     gateOpened = true;
+    gateOpenedTimestamp = performance.now();
     chapterDwellElapsed = 0;
     autoY = window.scrollY;
     autoLastSet = autoY;
@@ -1409,21 +1671,21 @@
     document.body.classList.remove('gate-locked');
     if (gate) gate.classList.add('unfolded');
 
-    triggerLensBloom(0.7);
-    spawnPetalBurst(vw * 0.5, vh * 0.46, 54, 'royal');
+    triggerLensBloom(0.75);
+    spawnPetalBurst(vw * 0.5, vh * 0.46, 58, 'royal');
 
     if (!fromAutoTimer) {
       ensureAudioCtx();
       playTempleBell(1.0, 0.14);
     }
     tryPlayActiveTrack(true);
-    setTimeout(preloadRemainingTracks, 600);
+    setTimeout(preloadRemainingTracks, 500);
     updateMusicHud();
     updateAutoScrollHud();
   }
 
-  // Hands-free fallback: even if the tab was throttled, the gate still opens ~2.7s after load
-  setTimeout(() => openRoyalGatefold(true), GATE_AUTO_OPEN_MS + 250);
+  // Hands-free fallback: even if the tab was throttled, the gate still opens ~1.1s after load
+  setTimeout(() => openRoyalGatefold(true), GATE_AUTO_OPEN_MS + 180);
 
   $('#seal-unlock-btn')?.addEventListener('click', () => openRoyalGatefold(false));
   $('#gate-enter-music-btn')?.addEventListener('click', () => openRoyalGatefold(false));
@@ -1439,19 +1701,29 @@
       const gate = $('#royal-gatefold');
       if (gate) gate.classList.remove('unfolded');
       document.body.classList.add('gate-locked');
-    }, 650);
+    }, 550);
   });
 
   // ---------- Top HUD & Interactive Elements ----------
+  const themeOrder = ['day', 'dusk', 'night'];
+  $('#theme-toggle-btn')?.addEventListener('click', (e) => {
+    ensureAudioCtx();
+    userOverrodeTheme = true;
+    const nextIdx = (themeOrder.indexOf(currentTheme) + 1) % themeOrder.length;
+    applyTheme(themeOrder[nextIdx], true);
+    const r = e.currentTarget.getBoundingClientRect();
+    spawnPetalBurst(r.left + r.width / 2, r.bottom + 8, 24, 'royal');
+  });
+
   $('#music-toggle-btn')?.addEventListener('click', () => {
     ensureAudioCtx();
     if (awaitingGestureUnlock) {
       musicEnabled = true;
       awaitingGestureUnlock = false;
-      tryPlayActiveTrack();
+      tryPlayActiveTrack(true);
     } else {
       musicEnabled = !musicEnabled;
-      if (musicEnabled) tryPlayActiveTrack();
+      if (musicEnabled) tryPlayActiveTrack(true);
     }
     updateMusicHud();
   });
@@ -1631,9 +1903,28 @@
     playTempleBell(1.25, 0.11);
   });
 
-  // ---------- Chapter 2 Live Nepal-Time Countdown & Calendar (.ics) ----------
+  // ---------- Chapter 2 Dual-Celebration Live Nepal-Time Countdown & Radial Medallions ----------
+  const cdEventConfigs = {
+    sangeet: {
+      iso: '2026-11-24T18:00:00+05:45',
+      en: 'Counting down to Haldi, Mehendi & Sangeet · Tue, 24 Nov 2026 · 6:00 PM NPT',
+      ne: 'हल्दी, मेहन्दी र संगीतको प्रतीक्षा · मंगलवार, २४ नोभेम्बर २०२६ · साँझ ६:०० बजे'
+    },
+    vivah: {
+      iso: '2026-11-25T17:00:00+05:45',
+      en: 'Counting down to Shubh Vivah · Wed, 25 Nov 2026 · 5:00 PM NPT',
+      ne: 'शुभ विवाहको प्रतीक्षा · बुधवार, २५ नोभेम्बर २०२६ · साँझ ५:०० बजे'
+    }
+  };
+
   function updateCountdown() {
-    const targetMs = new Date('2026-11-25T17:00:00+05:45').getTime();
+    if (!userOverrodeTheme) {
+      const autoTh = detectTimeOfDayTheme();
+      if (autoTh !== currentTheme) applyTheme(autoTh, false);
+    }
+
+    const cfg = cdEventConfigs[countdownTargetMode] || cdEventConfigs.vivah;
+    const targetMs = new Date(cfg.iso).getTime();
     let diff = Math.max(0, Math.floor((targetMs - Date.now()) / 1000));
     const days = Math.floor(diff / 86400);
     diff %= 86400;
@@ -1642,12 +1933,46 @@
     const mins = Math.floor(diff / 60);
     const secs = diff % 60;
 
+    const circ = 238.76;
+    const arcMap = {
+      'cd-arc-days': clamp(days / 30, 0.06, 1),
+      'cd-arc-hours': clamp(hours / 24, 0.04, 1),
+      'cd-arc-mins': clamp(mins / 60, 0.04, 1),
+      'cd-arc-secs': clamp(secs / 60, 0.03, 1)
+    };
+    Object.entries(arcMap).forEach(([arcId, frac]) => {
+      const arcEl = document.getElementById(arcId);
+      if (arcEl) arcEl.setAttribute('stroke-dashoffset', (circ * (1 - frac)).toFixed(2));
+    });
+
     const map = { 'cd-days': days, 'cd-hours': hours, 'cd-mins': mins, 'cd-secs': secs };
     Object.entries(map).forEach(([id, val]) => {
       const el = document.getElementById(id);
-      if (el) el.textContent = nepaliDigits(String(val).padStart(2, '0'));
+      if (!el) return;
+      const formatted = nepaliDigits(String(val).padStart(2, '0'));
+      if (lastCountdownVals[id] && lastCountdownVals[id] !== formatted) {
+        const tile = el.closest('.cd-tile');
+        if (tile) {
+          tile.classList.add('tick-pulse');
+          setTimeout(() => tile.classList.remove('tick-pulse'), 240);
+        }
+      }
+      lastCountdownVals[id] = formatted;
+      el.textContent = formatted;
     });
+
+    const subEl = $('#cd-live-subnote');
+    if (subEl) subEl.textContent = lang === 'ne' ? cfg.ne : cfg.en;
   }
+
+  $$('.cd-evt-btn').forEach((btn) => {
+    btn.addEventListener('click', () => {
+      countdownTargetMode = btn.dataset.cdTarget || 'vivah';
+      $$('.cd-evt-btn').forEach((b) => b.classList.toggle('active', b === btn));
+      updateCountdown();
+    });
+  });
+
   setInterval(updateCountdown, 1000);
 
   function downloadWeddingICS() {
@@ -1686,7 +2011,7 @@
   }
   $$('.save-ics-trigger').forEach((btn) => btn.addEventListener('click', downloadWeddingICS));
 
-  // ---------- Chapter 5 Concierge Tabs & Copy Venue ----------
+  // ---------- Chapter 5 Concierge Tabs & Reliable Clipboard Copy Helpers ----------
   const guideContent = {
     attire: {
       en: '<strong>24 Nov · Haldi, Mehendi &amp; Sangeet:</strong> Vibrant pastels, marigold yellows, mint greens, or festive Indo-westerns.<br><strong>25 Nov · Shubh Vivah:</strong> Royal sarees, lehengas, sherwanis, or festive formal attire.',
@@ -1716,22 +2041,46 @@
     });
   });
 
+  async function copyTextSafe(text) {
+    try {
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        await navigator.clipboard.writeText(text);
+        return true;
+      }
+    } catch (_) {}
+    try {
+      const ta = document.createElement('textarea');
+      ta.value = text;
+      ta.setAttribute('readonly', '');
+      ta.style.position = 'fixed';
+      ta.style.opacity = '0';
+      document.body.appendChild(ta);
+      ta.select();
+      const ok = document.execCommand('copy');
+      document.body.removeChild(ta);
+      return ok;
+    } catch (_) {
+      return false;
+    }
+  }
+
   $('#copy-venue-btn')?.addEventListener('click', async () => {
     const addr =
       'Mithila Awadh Dharmashala (Mithila Abadh Sanskritik Sanrakchan Parishad), Bajrang Chowk-8, Opposite Janaki Health Care Hospital, Janakpur Dham, Nepal';
-    try {
-      await navigator.clipboard.writeText(addr);
-      showToast('Venue address copied!', 'ठेगाना कपी भयो!');
-    } catch (_) {
-      showToast('Mithila Awadh Dharmashala · Bajrang Chowk–8', 'मिथिला अवध धर्मशाला · बजरंग चोक–८');
-    }
+    await copyTextSafe(addr);
+    showToast('📍 Venue address copied to clipboard!', '📍 समारोह स्थलको ठेगाना कपी भयो!');
+  });
+
+  $('#copy-phone-btn')?.addEventListener('click', async () => {
+    await copyTextSafe('+9779745315294');
+    showToast('📞 Family phone (+977 974-5315294) copied!', '📞 परिवारको फोन नम्बर कपी भयो!');
   });
 
   // ---------- Chapter 6: 3D Getaway Car Controls, 5-Diya Thali & WhatsApp RSVP ----------
   function triggerCarHonkAndTurbo(el) {
     ensureAudioCtx();
     carTurboBoost = 1.0;
-    if (carSceneTime < 2.0) carSceneTime = 2.05;
+    if (carSceneTime < 2.85) carSceneTime = 2.9;
     playVintageHorn();
     spawnCarWakePetal(220, 290, 14);
     if (el) {
@@ -1749,7 +2098,7 @@
     carTurboBoost = 0;
     setTimeout(() => {
       if (visibleChapters.has('ch6-finale')) playVintageHorn();
-    }, 1850);
+    }, 2200);
   });
 
   function updateDiyaCountLabel() {
@@ -1809,10 +2158,10 @@
     const confirmEl = $('#rsvp-confirmation-note');
     if (confirmEl) {
       confirmEl.hidden = false;
-      confirmEl.textContent =
+      confirmEl.innerHTML =
         lang === 'ne'
-          ? `धन्यवाद ${guestName}! व्हाट्सएपमा तपाईंको सन्देश तयार छ।`
-          : `Thank you, ${guestName}! Opening WhatsApp with your RSVP & blessing.`;
+          ? `धन्यवाद ${guestName}! <a href="${waUrl}" target="_blank" rel="noopener noreferrer" style="color:inherit;text-decoration:underline;">व्हाट्सएपमा पठाउन यहाँ थिच्नुहोस् ↗</a>`
+          : `Thank you, ${guestName}! <a href="${waUrl}" target="_blank" rel="noopener noreferrer" style="color:inherit;text-decoration:underline;">Tap here if WhatsApp did not open automatically ↗</a>`;
     }
     window.open(waUrl, '_blank', 'noopener,noreferrer');
   });
@@ -1827,7 +2176,7 @@
           url: shareUrl
         });
       } else {
-        await navigator.clipboard.writeText(shareUrl);
+        await copyTextSafe(shareUrl);
         showToast('Invitation link copied!', 'निमन्त्रणा लिङ्क कपी भयो!');
       }
     } catch (_) {}
@@ -1851,6 +2200,7 @@
         lang === 'en' ? 'Switch language to Nepali' : 'Switch language to English'
       );
     }
+    applyTheme(currentTheme, false);
     updateMusicHud();
     updateAutoScrollHud();
     updateCountdown();

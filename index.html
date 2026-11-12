@@ -148,10 +148,11 @@
   <div id="scroll-progress-bar" aria-hidden="true"></div>
   <canvas id="ambient-vfx-canvas" aria-hidden="true"></canvas>
   <canvas id="fg-bokeh-canvas" aria-hidden="true"></canvas>
+  <div id="ios-duo-blur-veil" aria-hidden="true"></div>
   <div id="lens-bloom" aria-hidden="true"></div>
 
   <!-- ========================================================================
-       SMART AUTO-OPENING 3D ROYAL BI-FOLD JHAROKHA GATEFOLD (2.7s + TAP)
+       ULTRA-FAST iOS DUO-BLUR 3D ROYAL BI-FOLD JHAROKHA GATEFOLD (1.1s + TAP)
        ======================================================================== -->
   <div id="royal-gatefold" role="dialog" aria-modal="true" aria-label="Royal Wedding Invitation Gatefold">
     <div id="gate-wing-left" class="gate-wing">
@@ -217,7 +218,12 @@
     </a>
 
     <div class="hud-controls">
-      <button type="button" id="autoscroll-toggle-btn" class="hud-pill active-auto" aria-pressed="true" title="Toggle Smart Auto-Scroll Story">
+      <button type="button" id="theme-toggle-btn" class="hud-pill theme-pill" title="Switch Time-of-Day Theme (Day / Dusk / Night)" aria-label="Switch Time-of-Day Theme">
+        <span id="theme-pill-icon" aria-hidden="true">☀️</span>
+        <span id="theme-pill-label" class="pill-text-desktop">Day</span>
+      </button>
+
+      <button type="button" id="autoscroll-toggle-btn" class="hud-pill active-auto" aria-pressed="true" title="Toggle Gentle Reading Auto-Scroll">
         <svg class="auto-ring-svg" width="16" height="16" viewBox="0 0 24 24" aria-hidden="true">
           <circle cx="12" cy="12" r="9.5" fill="none" stroke="currentColor" stroke-opacity="0.28" stroke-width="2.5" />
           <circle id="auto-progress-circle" cx="12" cy="12" r="9.5" fill="none" stroke="currentColor" stroke-width="2.6"
@@ -361,6 +367,11 @@
               <span data-en="Shower Pushpanjali" data-ne="पुष्पाञ्जली अर्पण">Shower Pushpanjali</span>
             </button>
           </div>
+          <p class="flower-interactive-hint"
+             data-en="✨ Tip: Touch or swipe any falling flower in the background to make it bloom!"
+             data-ne="✨ टिप: पृष्ठभूमिमा झर्दै गरेका फूलहरूलाई छुनुहोस् वा स्वाइप गर्नुहोस्!">
+            ✨ Tip: Touch or swipe any falling flower in the background to make it bloom!
+          </p>
         </div>
       </div>
     </section>
@@ -430,12 +441,75 @@
              data-en="8 – 9 Mangsir 2083 &nbsp;·&nbsp; Janakpur Dham, Nepal"
              data-ne="८ – ९ मंसिर २०८३ &nbsp;·&nbsp; जनकपुरधाम, नेपाल">8 – 9 Mangsir 2083 &nbsp;·&nbsp; Janakpur Dham, Nepal</p>
 
-          <div class="countdown-royal-grid" aria-label="Countdown to Shubh Vivah">
-            <div class="cd-tile"><b id="cd-days">00</b><small data-en="Days" data-ne="दिन">Days</small></div>
-            <div class="cd-tile"><b id="cd-hours">00</b><small data-en="Hours" data-ne="घण्टा">Hours</small></div>
-            <div class="cd-tile"><b id="cd-mins">00</b><small data-en="Minutes" data-ne="मिनेट">Minutes</small></div>
-            <div class="cd-tile"><b id="cd-secs">00</b><small data-en="Seconds" data-ne="सेकेन्ड">Seconds</small></div>
+          <!-- Live Time-of-Day Ambiance & Dual-Celebration Countdown Switcher -->
+          <div class="countdown-meta-bar">
+            <span id="tod-greeting-badge" class="tod-greeting-badge">☀️ Auspicious Daylight · Janakpur Dham</span>
+            <div class="cd-event-switcher" role="tablist" aria-label="Select Celebration Countdown">
+              <button type="button" class="cd-evt-btn" data-cd-target="sangeet"
+                      data-en="🌼 24 Nov · Sangeet (6 PM)"
+                      data-ne="🌼 २४ नोभेम्बर · संगीत (६ बजे)">🌼 24 Nov · Sangeet (6 PM)</button>
+              <button type="button" class="cd-evt-btn active" data-cd-target="vivah"
+                      data-en="👑 25 Nov · Shubh Vivah (5 PM)"
+                      data-ne="👑 २५ नोभेम्बर · शुभ विवाह (५ बजे)">👑 25 Nov · Shubh Vivah (5 PM)</button>
+            </div>
           </div>
+
+          <div class="countdown-royal-grid" aria-label="Countdown to Wedding Celebrations">
+            <div class="cd-tile">
+              <span class="cd-corner tl" aria-hidden="true"></span><span class="cd-corner tr" aria-hidden="true"></span>
+              <span class="cd-corner bl" aria-hidden="true"></span><span class="cd-corner br" aria-hidden="true"></span>
+              <div class="cd-ring-wrap">
+                <svg class="cd-ring-svg" viewBox="0 0 88 88" aria-hidden="true">
+                  <circle class="cd-ring-track" cx="44" cy="44" r="38" />
+                  <circle id="cd-arc-days" class="cd-ring-prog" cx="44" cy="44" r="38" stroke-dasharray="238.76" stroke-dashoffset="40" />
+                </svg>
+                <b id="cd-days">00</b>
+              </div>
+              <small data-en="Days" data-ne="दिन">Days</small>
+            </div>
+            <div class="cd-tile">
+              <span class="cd-corner tl" aria-hidden="true"></span><span class="cd-corner tr" aria-hidden="true"></span>
+              <span class="cd-corner bl" aria-hidden="true"></span><span class="cd-corner br" aria-hidden="true"></span>
+              <div class="cd-ring-wrap">
+                <svg class="cd-ring-svg" viewBox="0 0 88 88" aria-hidden="true">
+                  <circle class="cd-ring-track" cx="44" cy="44" r="38" />
+                  <circle id="cd-arc-hours" class="cd-ring-prog" cx="44" cy="44" r="38" stroke-dasharray="238.76" stroke-dashoffset="80" />
+                </svg>
+                <b id="cd-hours">00</b>
+              </div>
+              <small data-en="Hours" data-ne="घण्टा">Hours</small>
+            </div>
+            <div class="cd-tile">
+              <span class="cd-corner tl" aria-hidden="true"></span><span class="cd-corner tr" aria-hidden="true"></span>
+              <span class="cd-corner bl" aria-hidden="true"></span><span class="cd-corner br" aria-hidden="true"></span>
+              <div class="cd-ring-wrap">
+                <svg class="cd-ring-svg" viewBox="0 0 88 88" aria-hidden="true">
+                  <circle class="cd-ring-track" cx="44" cy="44" r="38" />
+                  <circle id="cd-arc-mins" class="cd-ring-prog" cx="44" cy="44" r="38" stroke-dasharray="238.76" stroke-dashoffset="120" />
+                </svg>
+                <b id="cd-mins">00</b>
+              </div>
+              <small data-en="Minutes" data-ne="मिनेट">Minutes</small>
+            </div>
+            <div class="cd-tile">
+              <span class="cd-corner tl" aria-hidden="true"></span><span class="cd-corner tr" aria-hidden="true"></span>
+              <span class="cd-corner bl" aria-hidden="true"></span><span class="cd-corner br" aria-hidden="true"></span>
+              <div class="cd-ring-wrap">
+                <svg class="cd-ring-svg" viewBox="0 0 88 88" aria-hidden="true">
+                  <circle class="cd-ring-track" cx="44" cy="44" r="38" />
+                  <circle id="cd-arc-secs" class="cd-ring-prog" cx="44" cy="44" r="38" stroke-dasharray="238.76" stroke-dashoffset="60" />
+                </svg>
+                <b id="cd-secs">00</b>
+              </div>
+              <small data-en="Seconds" data-ne="सेकेन्ड">Seconds</small>
+            </div>
+          </div>
+
+          <p id="cd-live-subnote" class="cd-live-subnote"
+             data-en="Counting down to Shubh Vivah · Wed, 25 Nov 2026 · 5:00 PM NPT"
+             data-ne="शुभ विवाहको प्रतीक्षा · बुधवार, २५ नोभेम्बर २०२६ · साँझ ५:०० बजे">
+            Counting down to Shubh Vivah · Wed, 25 Nov 2026 · 5:00 PM NPT
+          </p>
 
           <button type="button" class="btn-royal save-ics-trigger">
             <span>📅</span>
@@ -672,7 +746,7 @@
               <em>(Mithila Abadh Sanskritik Sanrakchan Parishad)</em><br />Bajrang Chowk–8, Opposite Janaki Health Care Hospital, Janakpur Dham, Nepal
             </p>
 
-            <div style="display:flex; flex-wrap:wrap; gap:9px; margin-top:16px;">
+            <div class="contact-hub-grid" style="display:flex; flex-wrap:wrap; gap:9px; margin-top:16px;">
               <a class="btn-royal"
                  href="https://www.google.com/maps/search/?api=1&query=Mithila+Abadh+Sanskritik+Sanrakchan+Parishad+Bajrang+Chowk+Janakpur+Nepal"
                  target="_blank" rel="noopener noreferrer">
@@ -680,15 +754,32 @@
                 <span data-en="Google Maps ↗" data-ne="गुगल नक्सा ↗">Google Maps ↗</span>
               </a>
 
+              <a class="btn-royal contact-wa-direct"
+                 href="https://wa.me/9779745315294?text=Namaste%20Mishra%20Family!%20Warm%20congratulations%20on%20the%20wedding%20of%20Dr.%20Diksha%20%26%20Dr.%20Aashik%20in%20Janakpur%20Dham!"
+                 target="_blank" rel="noopener noreferrer">
+                <span>💬</span>
+                <span data-en="WhatsApp Family Desk ↗" data-ne="व्हाट्सएप सम्पर्क ↗">WhatsApp Family Desk ↗</span>
+              </a>
+
+              <a class="btn-gold-outline contact-call-direct" href="tel:+9779745315294">
+                <span>📞</span>
+                <span data-en="Call +977 974-5315294" data-ne="फोन +९७७ ९७४-५३१५२९४">Call +977 974-5315294</span>
+              </a>
+
+              <a class="btn-gold-outline contact-sms-direct" href="sms:+9779745315294?body=Namaste%20Mishra%20Family!%20Heartfelt%20wishes%20for%20Dr.%20Diksha%20%26%20Dr.%20Aashik's%20wedding!">
+                <span>✉️</span>
+                <span data-en="Send SMS" data-ne="एसएमएस (SMS)">Send SMS</span>
+              </a>
+
+              <button type="button" id="copy-phone-btn" class="btn-gold-outline copy-phone-trigger">
+                <span>📱</span>
+                <span data-en="Copy Number" data-ne="नम्बर कपी">Copy Number</span>
+              </button>
+
               <button type="button" id="copy-venue-btn" class="btn-gold-outline">
                 <span>📋</span>
                 <span data-en="Copy Address" data-ne="ठेगाना कपी">Copy Address</span>
               </button>
-
-              <a class="btn-gold-outline" href="tel:+9779745315294">
-                <span>📞</span>
-                <span data-en="+977 974-5315294" data-ne="+९७७ ९७४-५३१५२९४">+977 974-5315294</span>
-              </a>
             </div>
           </div>
 
@@ -844,7 +935,17 @@
 
           <p id="rsvp-confirmation-note" hidden style="margin-top:10px; font-family:var(--font-sans); font-size:12px; font-weight:700; color:#166534;"></p>
 
-          <div style="display:flex; flex-wrap:wrap; justify-content:center; gap:9px; margin-top:14px;">
+          <div class="ch6-contact-strip" style="display:flex; flex-wrap:wrap; justify-content:center; gap:8px; margin-top:14px;">
+            <a class="btn-gold-outline contact-call-direct" href="tel:+9779745315294">
+              <span>📞</span>
+              <span data-en="Call Family (+977 974-5315294)" data-ne="परिवारमा फोन (+९७७ ९७४-५३१५२९४)">Call Family (+977 974-5315294)</span>
+            </a>
+            <a class="btn-gold-outline contact-wa-direct"
+               href="https://wa.me/9779745315294?text=Namaste%20Mishra%20Family!%20Warm%20wishes%20for%20Dr.%20Diksha%20%26%20Dr.%20Aashik!"
+               target="_blank" rel="noopener noreferrer">
+              <span>💬</span>
+              <span data-en="WhatsApp Desk ↗" data-ne="व्हाट्सएप ↗">WhatsApp Desk ↗</span>
+            </a>
             <button type="button" id="share-invite-btn" class="btn-gold-outline">
               <span>🔗</span>
               <span data-en="Share Invitation" data-ne="निमन्त्रणा साझा">Share Invitation</span>
