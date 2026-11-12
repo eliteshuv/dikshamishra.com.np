@@ -1,35 +1,39 @@
-# Diksha & Aashik — Shubh Vivah
+# Dr. Diksha Mishra & Dr. Aashik Jha — Royal Couture Wedding Website
 
-The guest experience is contained in index.html, including all seven artworks, CSS and JavaScript. Deploy this one file with CNAME for the existing GitHub Pages domain.
+Live domain: **https://dikshamishra.com.np/** (`CNAME`)
 
-## Share links
+Unified interactive royal couture wedding invitation website for **Dr. Diksha Mishra** and **Dr. Aashik Jha**, hosted with love by **Dipendra Mishra & Nilam Mishra** in **Janakpur Dham, Nepal**.
 
-- One-screen announcement with friends invitation button: https://dikshamishra.com.np/
-- Three days, 24–26 November: https://dikshamishra.com.np/?v=d1
-- Wedding and evening party, 25 November: https://dikshamishra.com.np/?v=d2
-- Friends, 24–25 November and Kathmandu reception TBA: https://dikshamishra.com.np/?v=d3
+When guests scan the QR seal at the end of the finalized **Bride's Grand Invitation Video Card**, they land directly on this single unified experience.
 
-Aliases ?v=full, ?v=day, ?v=friends and #full, #day, #friends also work. Root and invalid links show the announcement with a friends invitation button. The three detailed schedules are absent from one another’s navigation. These are guest-specific presentations, not password protection.
+## Confirmed Celebrations
 
-## Features
+- **Day 1 — Tuesday, 24 November 2026 (`8 Mangsir 2083`)**
+  - **Haldi, Mehendi & Sangeet Night** — **6:00 PM Onwards**
+  - Pastel hues, dhol beats & live concert under the stars
+  - **Venue:** Mithila Awadh Dharmashala *(Mithila Abadh Sanskritik Sanrakchan Parishad)*, Bajrang Chowk–8, Opposite Janaki Health Care Hospital, Janakpur Dham, Nepal
 
-- Seal opens automatically after three seconds, or immediately on tap.
-- Six cinematic chapters, scroll snapping, next/back, chapter dots and keyboard navigation.
-- Continuous automatic playback. Press and hold to linger; release resumes. Tall chapters begin scrolling their overflow after 2.6 seconds before advancing. Compact chapters fit the viewport where their content permits. Hover never pauses.
-- Complete Nepali/English views with device-local language preference.
-- Three unchanged wide originals for landscape screens; new full-screen portrait backgrounds for portrait screens, selected through picture sources and orientation media rules.
-- Animated light particles, bell petal burst, mandala, flame, image movement and staggered typography.
-- Interactive Ganesha blessing, flower shower, seven selectable wishes, expandable ceremony details, lightable diya, address copy and WhatsApp RSVP.
-- Optional synthesized ambient chimes and interactive bell, after user interaction.
-- Version-aware all-day calendar, share/copy, venue map, phone and WhatsApp.
-- Reduced motion, focus outlines, safe-area controls and no-JavaScript fallback.
+- **Day 2 — Wednesday, 25 November 2026 (`9 Mangsir 2083`)**
+  - **The Wedding · Shubh Vivah**
+  - **Preeti Bhoj:** 5:00 PM · **Baraat Swagat:** 7:00 PM *(followed by Varmala & auspicious Shubh Vivah Mandap rituals)*
+  - **Venue:** Mithila Awadh Dharmashala, Bajrang Chowk–8, Janakpur Dham, Nepal
 
-Wedding: 25 November 2026 / Mangsir 9, 2083. Phone: +977 974-5315294. Venue: Mithila Abadh Sanskritik Sanrakchan Parishad, Bajrang Chowk–8, opposite Janaki Health Care Hospital, Janakpur. Blessings: Dipendra Mishra and Nilam Mishra. Diksha’s parents host this invitation. Matkor: Sunday 22 November, provisional 4 PM. Haldi/Mehendi/Sangeet/concert: Tuesday 24 November from around 6 PM. Party: Wednesday 25 November at 6 PM, concert ~7:30 PM, Barmala ~9 PM. Bidai: Thursday 26 November, provisional 9 AM. Kathmandu reception TBA.
+- **Family Desk & RSVP:** `+977 974-5315294` (Phone & WhatsApp)
 
-## Editing
+## Architecture & Interactive Highlights
 
-Edit invitation.source.html, responsive-v2.css or interactions-v2.js, then run python build_invitation.py with Pillow installed. Image tokens are replaced with embedded WebPs. Preserve original PNGs; generated portrait WebPs are included. index.html runs independently of all source files and assets. Google Fonts is optional, with system fallbacks.
+- **Single Unified Link:** All visitors arrive on one complete experience at `https://dikshamishra.com.np/` (legacy `?v=` query parameters are automatically normalized).
+- **3D Royal Bi-Fold Jharokha Palace Gatefold:** Carved ivory-and-gold lattice doors with pointer-reactive metallic specular sheen and central `D & A` gold-foil clasp seal.
+- **Finalized Bride Master Soundtrack (`assets/couture/bride_soundtrack.mp3`):** Seamless looping master soundtrack paired with live 4-bar equalizer controls and Web Audio API harmonic temple bells, dhol drum beats, royal Tutari brass fanfare, and vintage car musical horn.
+- **6 Couture Chapters & Live Canvas Shaders:**
+  1. **Divine Temple Sanctuary:** 3-layer counter-rotating 36-ray Surya sunburst & Sanskrit mantra halo, interactive Pushpanjali flower offering on Lord Ganesha, 5 clickable harmonic brass bells, and clickable multi-wick Brass Samai lamps.
+  2. **Bride's Royal Courtyard & Live Countdown:** Illuminated 20-bulb Edison marquee mirror crest, 2.5D breeze-warped lakeside couple portrait canvas, live Nepal-time (`+05:45`) countdown, and dual-event `.ics` calendar export.
+  3. **Haldi, Mehendi & Sangeet Carnival:** Twirling Rajasthani marigold parasols, clickable Tutari horns, volumetric Gulal colour smoke cannons, and 72-strip 2D puppet-animated Sangeet dancers reactive to Dhol beats.
+  4. **Shubh Vivah Royal Mandap:** Swinging crystal chandeliers, symmetrical Preeti Bhoj & Baraat Swagat schedule, royal Mandap couple portrait, and 7 interactive Saptapadi blessing lotus petals.
+  5. **Celebration Itinerary & Venue Concierge:** Side-by-side 2-day summary, one-tap Google Maps, address copy, phone/WhatsApp links, and interactive Dress Palette / Travel / Weather tabs.
+  6. **Vintage Getaway Car Finale, 5-Diya Aarti Thali & RSVP Studio:** Continuously scrolling palace driveway, clickable lotus convertible car, 5-diya interactive blessing tray, and personalized WhatsApp RSVP & blessing composer.
+- **Complete Bilingual Toggle (`English` ⇄ `नेपाली`):** Instant translation across all chapters, schedules, wishes, concierge tabs, and Devanagari numerals.
 
-verify.cjs uses the available local Playwright runtime and Edge to check routes, schedules, mobile/desktop/landscape widths, language, navigation and browser errors. Preview images are ignored. See DESIGN.md for artwork prompts and references.
+## Verification
 
-verify-v2.cjs validates the root fits without scrolling in both languages and multiple orientations, portrait art selection, new interactions and early overflow scrolling.
+Run `node verify-couture.cjs` to launch a local HTTP server and verify responsive viewports (`320px`, `390px`, `1440px`), interactive controls, bilingual switching, asset loading, and zero console/page errors via headless Microsoft Edge & Playwright.
