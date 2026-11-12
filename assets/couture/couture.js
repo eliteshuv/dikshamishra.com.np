@@ -31,6 +31,7 @@
   let gateOpened = false;
   const GATE_AUTO_OPEN_MS = 2700; // Auto-opens cleanly at 2.7s (or immediately on tap)
   const gateBootTime = performance.now();
+  let gateStartMs = gateBootTime;
 
   let musicEnabled = true;          // Smart adaptive music ON by default
   let awaitingGestureUnlock = false; // True if browser deferred autoplay until first touch/scroll
@@ -175,6 +176,7 @@
     if (!btn) return;
     const isPlayingNow = musicEnabled && !awaitingGestureUnlock;
     btn.classList.toggle('active-music', isPlayingNow);
+    btn.classList.toggle('needs-tap', musicEnabled && awaitingGestureUnlock);
     btn.setAttribute('aria-pressed', String(musicEnabled));
 
     const lbl = $('#music-pill-label');
@@ -189,20 +191,34 @@
     }
   }
 
-  function tryPlayActiveTrack() {
+  // iOS Safari ignores HTMLMediaElement.volume (always 1) -> use hard switching there
+  const volumeUnsupported =
+    /iP(hone|ad|od)/.test(navigator.userAgent) ||
+    (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+  let lastPlayAttempt = 0;
+
+  function tryPlayActiveTrack(force = false) {
     if (!musicEnabled) return;
     const cur = chapterTracks[activeChapterIdx];
     if (!cur || !cur.el) return;
+    const nowMs = performance.now();
+    if (!force && nowMs - lastPlayAttempt < 900) return;
+    lastPlayAttempt = nowMs;
     if (cur.el.paused) {
-      cur.el.volume = clamp(cur.vol, 0, MAX_MUSIC_VOL);
+      if (!volumeUnsupported) cur.el.volume = clamp(Math.sin(cur.vol * Math.PI * 0.5) * MAX_MUSIC_VOL, 0, MAX_MUSIC_VOL);
       const p = cur.el.play();
       if (p && typeof p.then === 'function') {
         p.then(() => {
-          awaitingGestureUnlock = false;
-          updateMusicHud();
+          if (awaitingGestureUnlock) {
+            awaitingGestureUnlock = false;
+            updateMusicHud();
+          }
         }).catch(() => {
-          awaitingGestureUnlock = true;
-          updateMusicHud();
+          if (!awaitingGestureUnlock) {
+            awaitingGestureUnlock = true;
+            updateMusicHud();
+            showToast('Tap anywhere to start the music 🎵', 'संगीतका लागि स्क्रिनमा छुनुहोस् 🎵');
+          }
         });
       }
     }
@@ -214,13 +230,19 @@
     chapterTracks.forEach((tr, idx) => {
       if (!tr.el) return;
       const shouldPlay = gateOpened && musicEnabled && idx === activeChapterIdx;
-      if (shouldPlay) {
-        if (tr.el.paused && !awaitingGestureUnlock) {
-          tryPlayActiveTrack();
+      if (volumeUnsupported) {
+        if (shouldPlay) {
+          if (tr.el.paused) tryPlayActiveTrack();
+        } else if (!tr.el.paused) {
+          tr.el.pause();
         }
-        if (!tr.el.paused) {
+        return;
+      }
+      if (shouldPlay) {
+        if (tr.el.paused) {
+          tryPlayActiveTrack();
+        } else {
           tr.vol = Math.min(1, tr.vol + step);
-          // Equal-power smooth curve
           const gain = Math.sin(tr.vol * Math.PI * 0.5) * MAX_MUSIC_VOL;
           tr.el.volume = clamp(gain, 0, MAX_MUSIC_VOL);
         }
@@ -238,18 +260,26 @@
     });
   }
 
-  // Automatic first-gesture audio unlocker (for mobile browsers after 2.7s timer auto-open)
+  // First real user activation (click / touchend / pointerup / key) unlocks the music.
+  // NOTE: browsers do NOT treat scroll, wheel or touchstart as an activation gesture.
+  let audioPrimed = false;
   function handleFirstUserGesture() {
+    ensureAudioCtx();
+    if (!audioPrimed && volumeUnsupported) {
+      // iOS: "unlock" every <audio> element inside one real gesture so later chapter switches can play
+      audioPrimed = true;
+      chapterTracks.forEach((tr, idx) => {
+        if (!tr.el || idx === activeChapterIdx) return;
+        const p = tr.el.play();
+        if (p && p.then) p.then(() => tr.el.pause()).catch(() => {});
+      });
+    }
     if (musicEnabled && gateOpened) {
-      ensureAudioCtx();
       const cur = chapterTracks[activeChapterIdx];
-      if (cur && cur.el && cur.el.paused) {
-        awaitingGestureUnlock = false;
-        tryPlayActiveTrack();
-      }
+      if (cur && cur.el && cur.el.paused) tryPlayActiveTrack(true);
     }
   }
-  ['pointerdown', 'touchstart', 'wheel', 'keydown'].forEach((evt) => {
+  ['pointerup', 'touchend', 'click', 'keydown'].forEach((evt) => {
     window.addEventListener(evt, handleFirstUserGesture, { passive: true, capture: true });
   });
 
@@ -1039,13 +1069,19 @@
     }
   }
 
+  // Continuous, gentle "cinematic cruise" auto-scroll (floating-point position => silky on every device)
+  let autoY = 0;
+  let autoLastSet = -1;
+  let autoStartedOnce = false;
+
   function setAutoScroll(enabled, announce = false) {
     autoScrollActive = Boolean(enabled);
-    chapterDwellElapsed = 0;
+    autoY = window.scrollY;
+    autoLastSet = autoY;
     updateAutoScrollHud();
     if (announce) {
       showToast(
-        autoScrollActive ? 'Smart Auto-Scroll Story resumed' : 'Auto-Scroll paused — explore freely',
+        autoScrollActive ? 'Auto-scroll story on' : 'Auto-scroll paused — explore freely',
         autoScrollActive ? 'स्वतः स्क्रोल सुरु भयो' : 'स्वतः स्क्रोल रोकियो'
       );
     }
@@ -1054,18 +1090,17 @@
   function scrollToChapterSmooth(idx) {
     const target = chapters[idx];
     if (!target) return;
-    programmaticScrollUntil = performance.now() + 1450;
     target.scrollIntoView({ behavior: 'smooth', block: 'start' });
   }
 
-  // Politely pause Auto-Scroll if the user manually wheels, swipes, or types in RSVP!
-  ['wheel', 'touchmove'].forEach((evt) => {
+  // Politely pause auto-scroll the moment the guest touches / wheels / uses keys
+  ['wheel', 'touchmove', 'keydown'].forEach((evt) => {
     window.addEventListener(
       evt,
-      () => {
-        if (gateOpened && autoScrollActive && performance.now() > programmaticScrollUntil) {
-          setAutoScroll(false, false);
-        }
+      (e) => {
+        if (!gateOpened || !autoScrollActive) return;
+        if (evt === 'keydown' && !/^(ArrowUp|ArrowDown|PageUp|PageDown|Home|End| )$/.test(e.key)) return;
+        setAutoScroll(false, false);
       },
       { passive: true }
     );
@@ -1076,11 +1111,31 @@
   });
 
   $('#autoscroll-toggle-btn')?.addEventListener('click', () => {
-    if (!autoScrollActive && activeChapterIdx >= chapters.length - 1) {
-      scrollToChapterSmooth(0);
+    const maxY = document.documentElement.scrollHeight - window.innerHeight;
+    if (!autoScrollActive && window.scrollY >= maxY - 8) {
+      window.scrollTo({ top: 0, behavior: 'instant' });
     }
     setAutoScroll(!autoScrollActive, true);
   });
+
+  function stepAutoScroll(dt) {
+    if (!(gateOpened && autoScrollActive)) return;
+    const maxY = document.documentElement.scrollHeight - window.innerHeight;
+    // If something else moved the page (smooth anchor, etc.) re-sync
+    if (Math.abs(window.scrollY - autoLastSet) > 3) autoY = window.scrollY;
+    // ~ one full screen every 11s on every device; slower on the long RSVP finale
+    const base = window.innerHeight / 11;
+    const speed = activeChapterIdx >= 5 ? base * 0.7 : base;
+    autoY = Math.min(maxY, autoY + speed * dt);
+    autoLastSet = autoY;
+    window.scrollTo({ top: autoY, behavior: 'instant' });
+
+    const ring = $('#auto-progress-circle');
+    if (ring) {
+      ring.setAttribute('stroke-dashoffset', (59.7 * (1 - clamp(autoY / Math.max(1, maxY), 0, 1))).toFixed(2));
+    }
+    if (autoY >= maxY - 1) setAutoScroll(false, false); // reached the RSVP — hand control to the guest
+  }
 
   // ==========================================================================
   // MASTER 60FPS ANIMATION, AUTO-GATEFOLD, AUDIO & AUTO-SCROLL LOOP
@@ -1096,7 +1151,7 @@
 
     // A) Smart 2.7s Gatefold Auto-Open Countdown Ring
     if (!gateOpened) {
-      const elapsedGate = now - gateBootTime;
+      const elapsedGate = now - gateStartMs;
       const gateProg = clamp(elapsedGate / GATE_AUTO_OPEN_MS, 0, 1);
       if (gateRingEl) {
         gateRingEl.setAttribute('stroke-dashoffset', (823 * (1 - gateProg)).toFixed(1));
@@ -1109,24 +1164,8 @@
     // B) Step 6-Deck Chapter Audio Crossfader
     stepAudioCrossfader(dt);
 
-    // C) Step Smart Auto-Scroll Story Timer
-    if (gateOpened && autoScrollActive) {
-      const dwellTarget = CHAPTER_DWELL_SEC[activeChapterIdx] || 9.5;
-      chapterDwellElapsed += dt;
-      if (autoCircleEl) {
-        const p = clamp(chapterDwellElapsed / dwellTarget, 0, 1);
-        autoCircleEl.setAttribute('stroke-dashoffset', (59.7 * (1 - p)).toFixed(2));
-      }
-      if (chapterDwellElapsed >= dwellTarget) {
-        chapterDwellElapsed = 0;
-        if (activeChapterIdx < chapters.length - 1) {
-          scrollToChapterSmooth(activeChapterIdx + 1);
-        } else {
-          // Completed full story tour at Chapter 6 RSVP — pause gently so guest can RSVP!
-          setAutoScroll(false, false);
-        }
-      }
-    }
+    // C) Smart continuous auto-scroll cruise
+    stepAutoScroll(dt);
 
     // D) Autonomous Chapter 4 Saptapadi Wish Cycling (every 3.8s while viewing Chapter 4)
     if (visibleChapters.has('ch4-vivah')) {
@@ -1363,6 +1402,8 @@
     if (gateOpened) return;
     gateOpened = true;
     chapterDwellElapsed = 0;
+    autoY = window.scrollY;
+    autoLastSet = autoY;
 
     const gate = $('#royal-gatefold');
     document.body.classList.remove('gate-locked');
@@ -1375,25 +1416,30 @@
       ensureAudioCtx();
       playTempleBell(1.0, 0.14);
     }
-    tryPlayActiveTrack();
+    tryPlayActiveTrack(true);
     setTimeout(preloadRemainingTracks, 600);
     updateMusicHud();
     updateAutoScrollHud();
   }
+
+  // Hands-free fallback: even if the tab was throttled, the gate still opens ~2.7s after load
+  setTimeout(() => openRoyalGatefold(true), GATE_AUTO_OPEN_MS + 250);
 
   $('#seal-unlock-btn')?.addEventListener('click', () => openRoyalGatefold(false));
   $('#gate-enter-music-btn')?.addEventListener('click', () => openRoyalGatefold(false));
 
   $('#replay-gate-btn')?.addEventListener('click', () => {
     setAutoScroll(true, false);
-    scrollToChapterSmooth(0);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
     setTimeout(() => {
       gateOpened = false;
+      gateStartMs = performance.now();
+      const ring = $('#gate-auto-ring');
+      if (ring) ring.setAttribute('stroke-dashoffset', '823');
       const gate = $('#royal-gatefold');
       if (gate) gate.classList.remove('unfolded');
       document.body.classList.add('gate-locked');
-      setTimeout(() => openRoyalGatefold(false), 2500);
-    }, 450);
+    }, 650);
   });
 
   // ---------- Top HUD & Interactive Elements ----------
