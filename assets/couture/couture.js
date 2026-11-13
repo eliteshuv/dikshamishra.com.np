@@ -42,7 +42,7 @@
   let userOverrodeTheme = false;
 
   let gateOpened = false;
-  const GATE_AUTO_OPEN_MS = 1080; // Ultra-fast 1.08s auto-open with iOS Duo depth-of-field blur reveal!
+  const GATE_AUTO_OPEN_MS = 2300; // Graceful ~2.3s auto-open (tap still opens instantly) with iOS Duo depth-of-field blur reveal
   const gateBootTime = performance.now();
   let gateStartMs = gateBootTime;
   let gateOpenedTimestamp = 0;
@@ -229,7 +229,7 @@
   ];
 
   const MAX_MUSIC_VOL = 0.80;
-  const CROSSFADE_SECONDS = 1.35;
+  const CROSSFADE_SECONDS = 2.6;
 
   chapterTracks.forEach((tr) => {
     if (tr.el) tr.el.volume = 0;
@@ -253,9 +253,7 @@
 
     const lbl = $('#music-pill-label');
     if (!lbl) return;
-    if (!musicEnabled) {
-      lbl.textContent = lang === 'ne' ? 'संगीत बन्द' : 'Music Off';
-    } else if (awaitingGestureUnlock) {
+    if (awaitingGestureUnlock) {
       lbl.textContent = lang === 'ne' ? 'संगीत खोल्नुहोस्' : 'Tap for Sound';
     } else {
       const cur = chapterTracks[activeChapterIdx] || chapterTracks[0];
@@ -1275,12 +1273,14 @@
 
   // Continuous, gentle "cinematic cruise" auto-scroll (floating-point position => silky on every device)
   let autoY = 0;
+  let autoVel = 0;
   let autoLastSet = -1;
   let autoStartedOnce = false;
 
   function setAutoScroll(enabled, announce = false) {
     autoScrollActive = Boolean(enabled);
     autoY = window.scrollY;
+    autoVel = 0;
     autoLastSet = autoY;
     updateAutoScrollHud();
     if (announce) {
@@ -1347,7 +1347,13 @@
       }
     }
     const chapterFactor = activeChapterIdx >= 5 ? 0.65 : 1.0;
-    const speed = base * dwellFactor * chapterFactor;
+    // Gentle ease-in after the gate opens (ramps up over ~2.5s) + velocity smoothing so speed
+    // changes between "reading" and "travelling" glide instead of stepping.
+    const sinceOpen = (performance.now() - gateOpenedTimestamp - 2600) / 2500;
+    const startRamp = 0.5 - 0.5 * Math.cos(Math.PI * clamp(sinceOpen, 0, 1));
+    const targetSpeed = base * dwellFactor * chapterFactor * startRamp;
+    autoVel += (targetSpeed - autoVel) * (1 - Math.exp(-dt * 1.6));
+    const speed = autoVel;
 
     autoY = Math.min(maxY, autoY + speed * dt);
     autoLastSet = autoY;
@@ -1716,16 +1722,25 @@
   });
 
   $('#music-toggle-btn')?.addEventListener('click', () => {
+    // Sound is always ON — this pill only shows "Now Playing" and (re)starts the song if the browser blocked it.
     ensureAudioCtx();
-    if (awaitingGestureUnlock) {
-      musicEnabled = true;
-      awaitingGestureUnlock = false;
-      tryPlayActiveTrack(true);
-    } else {
-      musicEnabled = !musicEnabled;
-      if (musicEnabled) tryPlayActiveTrack(true);
-    }
+    musicEnabled = true;
+    awaitingGestureUnlock = false;
+    tryPlayActiveTrack(true);
     updateMusicHud();
+  });
+
+  // Pause when the guest leaves the tab / locks the phone, resume smoothly when they come back
+  document.addEventListener('visibilitychange', () => {
+    if (document.hidden) {
+      chapterTracks.forEach((tr) => {
+        if (tr.el && !tr.el.paused) tr.el.pause();
+      });
+    } else if (gateOpened) {
+      const cur = chapterTracks[activeChapterIdx];
+      if (cur) cur.vol = 0; // fade back in instead of blasting
+      tryPlayActiveTrack(true);
+    }
   });
 
   $('#hud-bell-btn')?.addEventListener('click', (e) => {

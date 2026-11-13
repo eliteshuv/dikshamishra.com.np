@@ -73,15 +73,15 @@ const assert = (c, m) => { if (!c) throw new Error('FAIL: ' + m); };
   ok('single clean URL, no Matkor/Kathmandu/Bidai');
   await page.screenshot({ path: path.join(ROOT, 'preview-portrait-gate.png') });
 
-  await page.waitForTimeout(1300); // Ultra-fast ~1.08s auto-open!
+  await page.waitForTimeout(2300); // graceful ~2.3s auto-open
   let s = await state(page);
-  assert(s.opened && !s.locked, 'gate did not auto-open within 1.3s: ' + JSON.stringify(s));
-  ok('gate auto-opened hands-free in ~1.08s with iOS Duo-blur reveal');
+  assert(s.opened && !s.locked, 'gate did not auto-open within ~2.8s: ' + JSON.stringify(s));
+  ok('gate auto-opened hands-free in ~2.3s with iOS Duo-blur reveal');
 
   // Wait past the 2.6s Chapter 1 reading warmup + 2.4s of gentle reading auto-scroll
-  await page.waitForTimeout(5000);
+  await page.waitForTimeout(8000);
   s = await state(page);
-  assert(s.y >= 15 && s.y <= 220, 'auto-scroll pace out of gentle reading range, y=' + s.y);
+  assert(s.y >= 8 && s.y <= 220, 'auto-scroll pace out of gentle reading range, y=' + s.y);
   assert(s.autoOn, 'auto badge off');
   ok('gentle reading-paced auto-scroll cruising slowly (scrollY=' + s.y + ')');
 
@@ -120,7 +120,7 @@ const assert = (c, m) => { if (!c) throw new Error('FAIL: ' + m); };
 
   for (const [id, idx] of [['ch3-carnival', 2], ['ch4-vivah', 3], ['ch6-finale', 5]]) {
     await page.evaluate((i) => window.scrollTo({ top: document.getElementById(i).offsetTop + 10, behavior: 'instant' }), id);
-    await page.waitForTimeout(1900);
+    await page.waitForTimeout(3300);
     s = await state(page);
     assert(s.playing[idx], `song for ${id} not playing: ` + JSON.stringify(s));
     assert(s.playing.filter(Boolean).length === 1, `more than one song at once at ${id}: ` + JSON.stringify(s.playing));
@@ -160,7 +160,7 @@ const assert = (c, m) => { if (!c) throw new Error('FAIL: ' + m); };
   await page.goto(base, { waitUntil: 'domcontentloaded' });
   await page.waitForTimeout(450);
   await page.click('#gate-enter-music-btn');
-  await page.waitForTimeout(1600);
+  await page.waitForTimeout(2400);
   s = await state(page);
   assert(s.opened && s.playing[0], 'desktop click-open: no song ' + JSON.stringify(s));
   ok('desktop: tap-to-open opens instantly and starts Ganesh song');
