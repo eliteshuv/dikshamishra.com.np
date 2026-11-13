@@ -86,8 +86,8 @@ const assert = (c, m) => { if (!c) throw new Error('FAIL: ' + m); };
   ok('gentle reading-paced auto-scroll cruising slowly (scrollY=' + s.y + ')');
 
   if (!s.playing[0]) {
-    assert(s.needsTap, 'no sound and no "Tap for Sound" hint: ' + JSON.stringify(s));
-    ok('autoplay blocked by browser -> pulsing "Tap for Sound" shown');
+    assert(!s.needsTap, 'Tap for Sound prompt should never show: ' + JSON.stringify(s));
+    ok('autoplay deferred silently (no Tap-for-Sound prompt) -> starts on first touch');
     await page.touchscreen.tap(200, 500);
     await page.waitForTimeout(1200);
     s = await state(page);
@@ -174,10 +174,11 @@ const assert = (c, m) => { if (!c) throw new Error('FAIL: ' + m); };
     hasSms: !!document.querySelector('a[href^="sms:+9779745315294"]'),
     hasCopyPhone: !!document.getElementById('copy-phone-btn'),
     hasCopyVenue: !!document.getElementById('copy-venue-btn'),
-    hasCdRings: document.querySelectorAll('.cd-ring-prog').length === 4
+    hasCdRings: document.querySelectorAll('.cd-ring-prog').length === 4,
+    hasMap: !!document.querySelector('a[href="https://maps.app.goo.gl/fwZfsJHDf5BtJRDW8"]')
   }));
   assert(
-    contactCheck.hasTel && contactCheck.hasWa && contactCheck.hasSms && contactCheck.hasCopyPhone && contactCheck.hasCopyVenue && contactCheck.hasCdRings,
+    contactCheck.hasTel && contactCheck.hasWa && contactCheck.hasSms && contactCheck.hasCopyPhone && contactCheck.hasCopyVenue && contactCheck.hasCdRings && contactCheck.hasMap,
     'Missing contact or countdown elements: ' + JSON.stringify(contactCheck)
   );
   ok('All contact methods (Call, WhatsApp, SMS, Copy Phone, Copy Venue) & 4 radial countdown medallions present');

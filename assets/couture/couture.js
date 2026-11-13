@@ -246,16 +246,14 @@
   function updateMusicHud() {
     const btn = $('#music-toggle-btn');
     if (!btn) return;
-    const isPlayingNow = musicEnabled && !awaitingGestureUnlock;
-    btn.classList.toggle('active-music', isPlayingNow);
-    btn.classList.toggle('needs-tap', musicEnabled && awaitingGestureUnlock);
-    btn.setAttribute('aria-pressed', String(musicEnabled));
+    // No "Tap for Sound" prompt ever — the pill always shows the chapter song; if the browser
+    // deferred autoplay, the music silently starts on the guest's very first touch / click.
+    btn.classList.add('active-music');
+    btn.classList.remove('needs-tap');
 
     const lbl = $('#music-pill-label');
     if (!lbl) return;
-    if (awaitingGestureUnlock) {
-      lbl.textContent = lang === 'ne' ? 'संगीत खोल्नुहोस्' : 'Tap for Sound';
-    } else {
+    {
       const cur = chapterTracks[activeChapterIdx] || chapterTracks[0];
       lbl.textContent = lang === 'ne' ? cur.ne : cur.en;
     }
@@ -284,11 +282,7 @@
             updateMusicHud();
           }
         }).catch(() => {
-          if (!awaitingGestureUnlock) {
-            awaitingGestureUnlock = true;
-            updateMusicHud();
-            showToast('Tap anywhere to start the music 🎵', 'संगीतका लागि स्क्रिनमा छुनुहोस् 🎵');
-          }
+          awaitingGestureUnlock = true; // silently wait for the first touch — no prompt shown
         });
       }
     }
@@ -349,7 +343,7 @@
       if (cur && cur.el && cur.el.paused) tryPlayActiveTrack(true);
     }
   }
-  ['pointerup', 'touchend', 'click', 'keydown'].forEach((evt) => {
+  ['pointerdown', 'mousedown', 'pointerup', 'touchend', 'click', 'keydown'].forEach((evt) => {
     window.addEventListener(evt, handleFirstUserGesture, { passive: true, capture: true });
   });
 
